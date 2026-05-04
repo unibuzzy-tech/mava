@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>uniBuzzy — AI Multi-Avatar Counseling Stage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0C1929;--navy-mid:#162438;--navy-deep:#07101C;
+  --cream:#F7F5F0;--cream-mid:#EDE9DF;
+  --teal:#0F7A64;--teal-light:#18B294;--teal-pale:#E0F5EF;
+  --txt:#0C1929;--txt2:#4B5563;--txt3:#9CA3AF;
+  --border:#E5E0D8;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--cream);color:var(--txt);line-height:1.6;overflow-x:hidden;}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:300;background:rgba(7,16,28,.88);backdrop-filter:blur(14px);padding:.85rem 3rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07);}
+.logo{font-family:'Lora',serif;font-size:1.35rem;font-weight:600;color:#fff;text-decoration:none;}
+.logo em{color:var(--teal-light);font-style:normal;}
+.nav-right{display:flex;align-items:center;gap:1.2rem;}
+.lang-wrap{display:flex;background:rgba(255,255,255,.08);border-radius:7px;overflow:hidden;}
+.lang-btn{padding:.28rem .65rem;font-size:.78rem;font-weight:500;color:rgba(255,255,255,.5);cursor:pointer;background:none;border:none;font-family:inherit;transition:all .2s;}
+.lang-btn.active{background:var(--teal);color:#fff;}
+.btn-nav{padding:.5rem 1.2rem;background:var(--teal-light);color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:500;cursor:pointer;font-family:inherit;transition:background .2s;text-decoration:none;display:inline-block;}
+.btn-nav:hover{background:var(--teal);}
+
+/* HERO — fixed band; copy pinned on video only */
+.hero{position:relative;width:100%;height:80vh;min-height:80vh;max-height:80vh;overflow:hidden;background:var(--navy-deep);}
+.hero-video-slot{position:relative;width:100%;height:100%;overflow:hidden;}
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;background:var(--navy-deep);z-index:0;pointer-events:none;}
+.hero-content{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 2.5rem max(1.25rem,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:flex-start;max-height:100%;overflow:hidden;pointer-events:none;}
+.hero-content > *{pointer-events:auto;}
+.hero-text-highlight{width:fit-content;max-width:100%;padding:1rem 1.35rem;margin-bottom:.85rem;border-radius:14px;background:rgba(7,16,28,.72);border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 40px rgba(0,0,0,.22);}
+.hero-badges-highlight{display:flex;gap:1.35rem;flex-wrap:wrap;width:fit-content;max-width:100%;padding:.85rem 1.25rem 1rem;border-radius:14px;background:rgba(7,16,28,.72);border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 40px rgba(0,0,0,.22);animation:fadeUp .55s .48s ease both;}
+.hero-tag{font-size:.65rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-light);margin-bottom:.55rem;animation:fadeUp .55s .05s ease both;}
+.hero-h1{font-family:'Lora',serif;font-size:clamp(1.45rem,calc(0.5rem + 2.8vw),2.35rem);font-weight:500;color:#fff;line-height:1.15;max-width:38rem;margin-bottom:.55rem;animation:fadeUp .55s .15s ease both;}
+.hero-h1 em{color:var(--teal-light);font-style:normal;}
+.hero-p{font-size:.84rem;color:rgba(255,255,255,.88);max-width:32rem;line-height:1.55;margin-bottom:.45rem;animation:fadeUp .55s .25s ease both;}
+.hero-tagline{font-size:.78rem;color:rgba(255,255,255,.62);max-width:30rem;line-height:1.5;margin-bottom:.75rem;animation:fadeUp .55s .32s ease both;}
+.hero-tagline strong{color:rgba(255,255,255,.92);}
+.hero-actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:0;animation:fadeUp .55s .4s ease both;}
+.btn-prim{padding:.55rem 1.25rem;background:var(--teal-light);color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:background .2s,transform .15s;}
+.btn-prim:hover{background:var(--teal);transform:translateY(-2px);}
+.btn-sec{padding:.55rem 1.25rem;background:rgba(255,255,255,.1);color:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.28);border-radius:8px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:all .2s;}
+.btn-sec:hover{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.18);}
+.hero-badge{display:flex;flex-direction:column;gap:.1rem;}
+.badge-val{font-family:'Lora',serif;font-size:1.1rem;font-weight:600;color:#fff;}
+.badge-label{font-size:.65rem;color:rgba(255,255,255,.58);}
+.badge-sub{font-size:.64rem;color:var(--teal-light);font-weight:500;}
+.badge-sep{width:1px;height:32px;background:rgba(255,255,255,.1);align-self:center;}
+@media (min-width:900px){
+  .hero-content{padding-left:3.5rem;padding-right:3.5rem;}
+}
+@media (max-width:640px){
+  .hero-h1{font-size:clamp(1.35rem,5.2vw,1.75rem);}
+  .hero-p,.hero-tagline{font-size:.76rem;}
+  .hero-text-highlight{padding:.85rem 1rem;}
+  .hero-badges-highlight{gap:1rem;padding:.7rem 1rem .85rem;}
+}
+@media (max-height:620px){
+  .hero-h1{font-size:clamp(1.2rem,calc(0.35rem + 2.2vh),1.65rem);margin-bottom:.35rem;}
+  .hero-p,.hero-tagline{font-size:.72rem;line-height:1.45;margin-bottom:.35rem;}
+  .hero-tagline{margin-bottom:.5rem;}
+  .hero-text-highlight{padding:.65rem .9rem;margin-bottom:.55rem;}
+  .hero-badges-highlight{gap:.75rem;padding:.55rem .85rem .65rem;}
+  .badge-val{font-size:1rem;}
+  .btn-prim,.btn-sec{padding:.45rem 1rem;font-size:.78rem;}
+}
+
+/* SECTIONS */
+section{padding:6rem 4rem;}
+.s-tag{font-size:.74rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:.9rem;}
+.s-h2{font-family:'Lora',serif;font-size:clamp(1.9rem,3.2vw,2.9rem);font-weight:500;line-height:1.2;margin-bottom:1.25rem;max-width:740px;}
+.s-p{font-size:1rem;color:var(--txt2);max-width:640px;line-height:1.78;}
+
+/* AVATARS SECTION */
+.sec-avatars{background:var(--navy);}
+.sec-avatars .s-tag{color:var(--teal-light);}
+.sec-avatars .s-h2{color:#fff;}
+.sec-avatars .s-p{color:rgba(255,255,255,.55);}
+.av-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+.av-card{border-radius:20px;overflow:hidden;background:var(--navy-mid);border:1px solid rgba(255,255,255,.08);transition:transform .25s,border-color .25s;}
+.av-card:hover{transform:translateY(-6px);border-color:rgba(24,178,148,.3);}
+.av-portrait{position:relative;height:280px;overflow:hidden;}
+.av-role-chip{position:absolute;top:14px;left:14px;z-index:2;padding:.28rem .75rem;border-radius:20px;font-size:.7rem;font-weight:500;letter-spacing:.05em;backdrop-filter:blur(8px);}
+.av-body{padding:1.5rem 1.5rem 1.75rem;}
+.av-name{font-family:'Lora',serif;font-size:1.3rem;font-weight:500;color:#fff;margin-bottom:.5rem;}
+.av-name-sub{font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:400;color:rgba(255,255,255,.38);margin-left:.5rem;}
+.av-desc{font-size:.87rem;color:rgba(255,255,255,.52);line-height:1.65;margin-bottom:1rem;}
+.av-traits{display:flex;flex-wrap:wrap;gap:.4rem;}
+.av-trait{padding:.2rem .65rem;border-radius:20px;font-size:.73rem;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1);}
+
+/* PROBLEM */
+.sec-problem{background:#fff;}
+.prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3rem;}
+.prob-card{padding:2rem;border-radius:18px;border:1px solid;}
+.prob-card.p1{background:#FFF8F6;border-color:#FED7D7;}
+.prob-card.p2{background:#F0FDF4;border-color:#BBF7D0;}
+.prob-h{font-family:'Lora',serif;font-size:1.2rem;font-weight:500;margin-bottom:.25rem;}
+.prob-sub{font-size:.8rem;color:var(--txt3);margin-bottom:1.25rem;}
+.prob-list{list-style:none;display:flex;flex-direction:column;gap:.65rem;}
+.prob-list li{font-size:.9rem;color:var(--txt2);padding-left:1.2rem;position:relative;line-height:1.55;}
+.prob-list li::before{content:'—';position:absolute;left:0;color:var(--txt3);}
+
+/* MAVA */
+.sec-mava{background:var(--cream);}
+.mava-layout{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;margin-top:3rem;}
+.mava-stage-img{width:100%;border-radius:20px;overflow:hidden;background:var(--navy);aspect-ratio:4/3;}
+.mava-box{padding:2.5rem;background:#fff;border-radius:18px;border:1px solid var(--border);}
+.mava-row{display:flex;align-items:flex-start;gap:1.2rem;margin-bottom:1.2rem;}
+.mava-letter{font-family:'Lora',serif;font-size:2.3rem;font-weight:600;color:var(--teal);min-width:32px;line-height:1;}
+.mava-words{display:flex;flex-direction:column;gap:.1rem;}
+.mava-word{font-size:1rem;color:var(--txt);font-weight:500;}
+.mava-def{font-size:.8rem;color:var(--txt3);}
+hr.mava-div{border:none;border-top:1px solid var(--border);margin:1.4rem 0;}
+.mava-desc{font-size:.92rem;color:var(--txt2);line-height:1.75;}
+.mava-desc strong{color:var(--txt);}
+.supermeta-chip{display:inline-block;margin-top:1.1rem;padding:.35rem 1rem;background:var(--teal-pale);border:1px solid rgba(15,122,100,.2);border-radius:20px;font-size:.78rem;color:var(--teal);font-weight:500;}
+
+/* FLOW */
+.sec-flow{background:#fff;}
+.flow-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-top:3rem;}
+.flow-col{padding:2.25rem;border-right:1px solid var(--border);}
+.flow-col:last-child{border-right:none;}
+.flow-col.center{background:var(--navy);}
+.flow-step{font-size:.7rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:.7rem;}
+.flow-col.center .flow-step{color:var(--teal-light);}
+.flow-h{font-family:'Lora',serif;font-size:1.3rem;font-weight:500;margin-bottom:.85rem;}
+.flow-col.center .flow-h{color:#fff;}
+.flow-pts{list-style:none;display:flex;flex-direction:column;gap:.55rem;}
+.flow-pts li{font-size:.86rem;color:var(--txt2);padding-left:.9rem;position:relative;line-height:1.55;}
+.flow-col.center .flow-pts li{color:rgba(255,255,255,.6);}
+.flow-pts li::before{content:'·';position:absolute;left:0;color:var(--teal-light);font-size:1.2rem;line-height:.95;}
+
+/* BENEFITS */
+.sec-benefits{background:var(--cream);}
+.feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:3rem;}
+.feat-card{padding:2rem;background:#fff;border-radius:16px;border:1px solid var(--border);}
+.feat-chip{display:inline-block;padding:.22rem .75rem;border-radius:20px;font-size:.74rem;font-weight:500;margin-bottom:.9rem;}
+.feat-chip.priv{background:var(--teal-pale);color:var(--teal);}
+.feat-chip.ctrl{background:#EFF6FF;color:#1D4ED8;}
+.feat-chip.empa{background:#FEF3C7;color:#92400E;}
+.feat-chip.scal{background:#F3E8FF;color:#7C3AED;}
+.feat-h{font-family:'Lora',serif;font-size:1.2rem;font-weight:500;margin-bottom:.65rem;}
+.feat-p{font-size:.88rem;color:var(--txt2);line-height:1.65;}
+
+/* NOT AI */
+.sec-not{background:var(--navy);padding:5.5rem 4rem;text-align:center;}
+.not-h{font-family:'Lora',serif;font-size:clamp(1.6rem,3vw,2.5rem);font-weight:500;color:#fff;max-width:700px;margin:0 auto 1rem;line-height:1.28;}
+.not-h em{color:var(--teal-light);font-style:normal;}
+.not-p{font-size:1rem;color:rgba(255,255,255,.48);max-width:540px;margin:.5rem auto 0;line-height:1.75;}
+
+/* VENUES */
+.sec-venues{background:#fff;padding:4rem;}
+.venues-label{font-size:.82rem;color:var(--txt3);text-align:center;margin-bottom:1.5rem;letter-spacing:.05em;}
+.venues-list{display:flex;justify-content:center;flex-wrap:wrap;gap:.75rem;}
+.v-pill{padding:.45rem 1.1rem;background:var(--cream);border:1px solid var(--border);border-radius:100px;font-size:.87rem;color:var(--txt2);}
+
+/* CTA */
+.sec-cta{background:var(--cream);text-align:center;padding:7rem 4rem;}
+.cta-tag{font-size:.76rem;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:1.2rem;}
+.cta-h{font-family:'Lora',serif;font-size:clamp(2rem,4vw,3.4rem);font-weight:500;color:var(--txt);line-height:1.2;max-width:700px;margin:0 auto 1.2rem;}
+.cta-h em{color:var(--teal);}
+.cta-p{font-size:1rem;color:var(--txt2);max-width:480px;margin:0 auto 2.5rem;line-height:1.72;}
+.cta-actions{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;}
+.btn-dark{padding:.82rem 1.9rem;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:.97rem;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:background .2s;}
+.btn-dark:hover{background:var(--navy-mid);}
+.btn-out{padding:.82rem 1.9rem;background:transparent;color:var(--txt);border:1px solid var(--border);border-radius:10px;font-size:.97rem;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:all .2s;}
+.btn-out:hover{border-color:var(--teal);color:var(--teal);}
+
+/* FOOTER */
+footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.foot-logo{font-family:'Lora',serif;font-size:1.2rem;color:#fff;}
+.foot-logo em{color:var(--teal-light);font-style:normal;}
+.foot-tagline{font-size:.78rem;color:rgba(255,255,255,.25);margin-top:.2rem;}
+.foot-r{font-size:.78rem;color:rgba(255,255,255,.25);}
+.foot-r a{color:rgba(255,255,255,.38);text-decoration:none;}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#"><em>uni</em>Buzzy</a>
+  <div class="nav-right">
+    <div class="lang-wrap">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('kr')">한국어</button>
+    </div>
+    <a href="#cta" class="btn-nav">
+      <span class="l en">Request a Demo</span>
+      <span class="l kr" style="display:none">데모 신청하기</span>
+    </a>
+  </div>
+</nav>
+
+<!-- HERO with video background -->
+<section class="hero">
+  <div class="hero-video-slot">
+    <video class="hero-video" autoplay muted loop playsinline preload="auto">
+      <source src="multi-avatar.mp4" type="video/mp4">
+    </video>
+  <div class="hero-content">
+    <div class="hero-text-highlight">
+    <p class="hero-tag">
+      <span class="l en">AI Multi-Avatar Counseling Stage · For Therapy Centers</span>
+      <span class="l kr" style="display:none">AI 멀티 아바타 상담 스테이지 · 상담센터를 위한 플랫폼</span>
+    </p>
+    <h1 class="hero-h1">
+      <span class="l en">Counseling where clients<br><em>don't have to speak first.</em></span>
+      <span class="l kr" style="display:none">환자가 먼저 말하지 않아도 되는<br><em>상담을 만듭니다.</em></span>
+    </h1>
+    <p class="hero-p">
+      <span class="l en">uniBuzzy is a next-generation counseling platform where therapists, clients, and AI patient avatars interact together on the same live stage.</span>
+      <span class="l kr" style="display:none">uniBuzzy는 상담사, 내담자, AI 환자 아바타가 함께 같은 스테이지에서 상호작용하는 차세대 상담 플랫폼입니다.</span>
+    </p>
+    <p class="hero-tagline">
+      <strong><span class="l en">Reduce the pressure of one-on-one counseling.</span><span class="l kr" style="display:none">1:1 상담의 부담은 줄이고,</span></strong><br>
+      <span class="l en">Safely scale the empathy of group therapy.</span>
+      <span class="l kr" style="display:none">집단상담의 공감 효과는 안전하게 확장합니다.</span>
+    </p>
+    <div class="hero-actions">
+      <a href="#cta" class="btn-prim"><span class="l en">Watch the Stage</span><span class="l kr" style="display:none">상담 스테이지 보기</span></a>
+      <a href="#cta" class="btn-sec"><span class="l en">Request a Demo</span><span class="l kr" style="display:none">데모 신청하기</span></a>
+    </div>
+    </div>
+    <div class="hero-badges-highlight">
+      <div class="hero-badge">
+        <span class="badge-val">MAVA</span>
+        <span class="badge-label"><span class="l en">Multi-Avatar Virtual Agent</span><span class="l kr" style="display:none">멀티 아바타 가상 에이전트</span></span>
+        <span class="badge-sub"><span class="l en">Guided Counseling</span><span class="l kr" style="display:none">가이드 상담</span></span>
+      </div>
+      <div class="badge-sep"></div>
+      <div class="hero-badge">
+        <span class="badge-val">Privacy</span>
+        <span class="badge-label"><span class="l en">First by design</span><span class="l kr" style="display:none">설계부터 안전</span></span>
+        <span class="badge-sub"><span class="l en">Safe counseling environment</span><span class="l kr" style="display:none">안전한 상담 환경</span></span>
+      </div>
+      <div class="badge-sep"></div>
+      <div class="hero-badge">
+        <span class="badge-val">60+</span>
+        <span class="badge-label"><span class="l en">Languages supported</span><span class="l kr" style="display:none">지원 언어</span></span>
+        <span class="badge-sub"><span class="l en">Multilingual counseling</span><span class="l kr" style="display:none">다국어 상담 지원</span></span>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- AVATARS -->
+<section class="sec-avatars">
+  <p class="s-tag reveal"><span class="l en">Meet the Three Counseling Avatars</span><span class="l kr" style="display:none">3가지 상담 아바타</span></p>
+  <h2 class="s-h2 reveal"><span class="l en">Each avatar is fully configured by the therapist — role, tone, emotional intensity, and experiential background.</span><span class="l kr" style="display:none">각 아바타의 역할, 말투, 감정 강도, 경험적 배경은 상담사가 직접 설정합니다.</span></h2>
+  <p class="s-p reveal"><span class="l en">They don't take turns like chatbots. They share the same context, react to each other, and naturally draw the client into conversation.</span><span class="l kr" style="display:none">아바타들은 순서대로 말하는 챗봇이 아닙니다. 같은 대화 맥락을 공유하고 서로에게 반응하며, 내담자를 자연스럽게 대화로 이끕니다.</span></p>
+
+  <div class="av-grid">
+    <!-- Avatar A: Listener -->
+    <div class="av-card reveal">
+      <div class="av-portrait" style="background:#0C2820;">
+        <span class="av-role-chip" style="background:rgba(24,178,148,.18);border:1px solid rgba(24,178,148,.32);color:#18B294;"><span class="l en">Type A · Listener</span><span class="l kr" style="display:none">유형 A · 경청형</span></span>
+        <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+          <defs>
+            <radialGradient id="glowA" cx="50%" cy="80%" r="50%">
+              <stop offset="0%" stop-color="#18B294" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#18B294" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="320" height="280" fill="#0C2820"/>
+          <ellipse cx="160" cy="270" rx="110" ry="22" fill="url(#glowA)"/>
+          <!-- body -->
+          <path d="M55,280 Q62,205 98,190 Q132,175 160,173 Q188,175 222,190 Q258,205 265,280Z" fill="#153D30"/>
+          <!-- neck -->
+          <rect x="148" y="145" width="24" height="32" rx="11" fill="#C09070"/>
+          <!-- collar hint -->
+          <path d="M128,192 Q160,208 192,192" stroke="rgba(24,178,148,.25)" stroke-width="1.5" fill="none"/>
+          <!-- head -->
+          <ellipse cx="160" cy="122" rx="43" ry="49" fill="#C09070"/>
+          <!-- hair back -->
+          <ellipse cx="160" cy="100" rx="48" ry="40" fill="#160800"/>
+          <!-- hair left flow -->
+          <path d="M117,102 Q95,145 100,192 Q108,205 118,200 Q110,165 114,135Z" fill="#160800"/>
+          <!-- hair right flow -->
+          <path d="M203,102 Q225,145 220,192 Q212,205 202,200 Q210,165 206,135Z" fill="#160800"/>
+          <!-- hair top -->
+          <path d="M117,98 Q140,70 160,68 Q180,70 203,98 Q186,82 160,80 Q134,82 117,98Z" fill="#160800"/>
+          <!-- ears -->
+          <ellipse cx="117" cy="126" rx="7" ry="9" fill="#B88060"/>
+          <ellipse cx="203" cy="126" rx="7" ry="9" fill="#B88060"/>
+          <!-- eyes -->
+          <ellipse cx="144" cy="120" rx="7" ry="5.5" fill="#fff"/>
+          <ellipse cx="176" cy="120" rx="7" ry="5.5" fill="#fff"/>
+          <ellipse cx="145" cy="121" rx="4.5" ry="4.5" fill="#1A0800"/>
+          <ellipse cx="177" cy="121" rx="4.5" ry="4.5" fill="#1A0800"/>
+          <ellipse cx="146" cy="120" rx="1.8" ry="1.8" fill="#fff"/>
+          <ellipse cx="178" cy="120" rx="1.8" ry="1.8" fill="#fff"/>
+          <!-- eyebrows -->
+          <path d="M137,112 Q144,108 152,112" stroke="#160800" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M168,112 Q176,108 183,112" stroke="#160800" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- nose -->
+          <path d="M157,129 Q156,140 160,141 Q164,140 163,129" stroke="#9A6840" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+          <!-- warm smile -->
+          <path d="M148,150 Q160,160 172,150" stroke="#9A6840" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <!-- earrings -->
+          <circle cx="117" cy="138" r="3.5" fill="#18B294" opacity=".85"/>
+          <circle cx="203" cy="138" r="3.5" fill="#18B294" opacity=".85"/>
+          <!-- cheek blush -->
+          <ellipse cx="140" cy="134" rx="8" ry="5" fill="rgba(255,160,120,.1)" transform="rotate(-12,140,134)"/>
+          <ellipse cx="180" cy="134" rx="8" ry="5" fill="rgba(255,160,120,.1)" transform="rotate(12,180,134)"/>
+        </svg>
+      </div>
+      <div class="av-body">
+        <h3 class="av-name">
+          <span class="l en">Seo-yeon</span><span class="l kr" style="display:none">서연</span>
+          <span class="av-name-sub"><span class="l en">The Listener</span><span class="l kr" style="display:none">경청형 아바타</span></span>
+        </h3>
+        <p class="av-desc"><span class="l en">Warm and non-judgmental. Validates feelings first, opens emotional space, and creates safety before any solution is offered.</span><span class="l kr" style="display:none">따뜻하고 비판 없이 감정을 먼저 인정하며, 해결책보다 안전한 감정 공간을 엽니다.</span></p>
+        <div class="av-traits">
+          <span class="av-trait"><span class="l en">Mild severity</span><span class="l kr" style="display:none">경증</span></span>
+          <span class="av-trait"><span class="l en">Empathetic</span><span class="l kr" style="display:none">공감적</span></span>
+          <span class="av-trait"><span class="l en">Low intensity</span><span class="l kr" style="display:none">낮은 강도</span></span>
+          <span class="av-trait"><span class="l en">Gentle tone</span><span class="l kr" style="display:none">부드러운 말투</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avatar B: Organizer -->
+    <div class="av-card reveal">
+      <div class="av-portrait" style="background:#091830;">
+        <span class="av-role-chip" style="background:rgba(59,130,246,.18);border:1px solid rgba(59,130,246,.32);color:#60A5FA;"><span class="l en">Type B · Organizer</span><span class="l kr" style="display:none">유형 B · 정리형</span></span>
+        <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+          <defs>
+            <radialGradient id="glowB" cx="50%" cy="80%" r="50%">
+              <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.16"/>
+              <stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="320" height="280" fill="#091830"/>
+          <ellipse cx="160" cy="270" rx="110" ry="22" fill="url(#glowB)"/>
+          <!-- blazer body -->
+          <path d="M55,280 Q60,205 100,190 Q133,174 160,172 Q187,174 220,190 Q260,205 265,280Z" fill="#112240"/>
+          <!-- lapels -->
+          <path d="M160,185 L144,218 L155,218 L160,204 L165,218 L176,218 Z" fill="#1A3050"/>
+          <!-- neck -->
+          <rect x="148" y="143" width="24" height="33" rx="11" fill="#C8A07A"/>
+          <!-- head -->
+          <ellipse cx="160" cy="120" rx="41" ry="47" fill="#C8A07A"/>
+          <!-- straight hair back -->
+          <ellipse cx="160" cy="95" rx="45" ry="33" fill="#2A1508"/>
+          <!-- hair sides straight cut -->
+          <rect x="115" y="95" width="13" height="68" rx="6" fill="#2A1508"/>
+          <rect x="192" y="95" width="13" height="68" rx="6" fill="#2A1508"/>
+          <!-- hair top -->
+          <path d="M115,93 Q138,67 160,65 Q182,67 205,93 Q187,78 160,76 Q133,78 115,93Z" fill="#2A1508"/>
+          <!-- ears -->
+          <ellipse cx="118" cy="124" rx="7" ry="9" fill="#B89060"/>
+          <ellipse cx="202" cy="124" rx="7" ry="9" fill="#B89060"/>
+          <!-- glasses -->
+          <rect x="132" y="114" width="28" height="18" rx="5" stroke="#3A3030" stroke-width="2" fill="rgba(180,210,255,.07)"/>
+          <rect x="162" y="114" width="28" height="18" rx="5" stroke="#3A3030" stroke-width="2" fill="rgba(180,210,255,.07)"/>
+          <line x1="160" y1="123" x2="162" y2="123" stroke="#3A3030" stroke-width="2"/>
+          <line x1="118" y1="123" x2="132" y2="123" stroke="#3A3030" stroke-width="1.5"/>
+          <line x1="190" y1="123" x2="202" y2="123" stroke="#3A3030" stroke-width="1.5"/>
+          <!-- eyes -->
+          <ellipse cx="146" cy="124" rx="4.5" ry="4" fill="#180C00"/>
+          <ellipse cx="176" cy="124" rx="4.5" ry="4" fill="#180C00"/>
+          <ellipse cx="147" cy="123" rx="1.8" ry="1.8" fill="#fff"/>
+          <ellipse cx="177" cy="123" rx="1.8" ry="1.8" fill="#fff"/>
+          <!-- eyebrows straight -->
+          <path d="M136,112 Q146,109 158,112" stroke="#2A1508" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M163,112 Q175,109 185,112" stroke="#2A1508" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <!-- nose -->
+          <path d="M157,131 Q156,142 160,143 Q164,142 163,131" stroke="#A07840" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <!-- composed smile -->
+          <path d="M149,150 Q160,156 171,150" stroke="#A07840" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- earrings studs -->
+          <circle cx="118" cy="134" r="3" fill="#60A5FA" opacity=".9"/>
+          <circle cx="202" cy="134" r="3" fill="#60A5FA" opacity=".9"/>
+        </svg>
+      </div>
+      <div class="av-body">
+        <h3 class="av-name">
+          <span class="l en">Ji-hee</span><span class="l kr" style="display:none">지희</span>
+          <span class="av-name-sub"><span class="l en">The Organizer</span><span class="l kr" style="display:none">정리형 아바타</span></span>
+        </h3>
+        <p class="av-desc"><span class="l en">Helps structure the conversation. Identifies patterns, brings calm clarity to complex emotions, and gently reframes without pushing.</span><span class="l kr" style="display:none">대화를 구조화하고, 복잡한 감정에 차분한 명확성을 가져오며, 강요 없이 부드럽게 재구성합니다.</span></p>
+        <div class="av-traits">
+          <span class="av-trait"><span class="l en">Moderate severity</span><span class="l kr" style="display:none">중증도</span></span>
+          <span class="av-trait"><span class="l en">Analytical</span><span class="l kr" style="display:none">분석적</span></span>
+          <span class="av-trait"><span class="l en">Structured</span><span class="l kr" style="display:none">체계적</span></span>
+          <span class="av-trait"><span class="l en">Calm voice</span><span class="l kr" style="display:none">차분한 말투</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avatar C: Peer -->
+    <div class="av-card reveal">
+      <div class="av-portrait" style="background:#1A1000;">
+        <span class="av-role-chip" style="background:rgba(217,119,6,.18);border:1px solid rgba(217,119,6,.32);color:#FCD34D;"><span class="l en">Type C · Peer</span><span class="l kr" style="display:none">유형 C · 친구형</span></span>
+        <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
+          <defs>
+            <radialGradient id="glowC" cx="50%" cy="80%" r="50%">
+              <stop offset="0%" stop-color="#D97706" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="#D97706" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="320" height="280" fill="#1A1000"/>
+          <ellipse cx="160" cy="270" rx="110" ry="22" fill="url(#glowC)"/>
+          <!-- casual sweater body -->
+          <path d="M55,280 Q60,208 100,193 Q134,177 160,175 Q186,177 220,193 Q260,208 265,280Z" fill="#2A1A05"/>
+          <!-- neck -->
+          <rect x="148" y="144" width="24" height="32" rx="11" fill="#8A5030"/>
+          <!-- head -->
+          <ellipse cx="160" cy="120" rx="42" ry="48" fill="#8A5030"/>
+          <!-- curly hair volume big -->
+          <ellipse cx="160" cy="86" rx="56" ry="44" fill="#180800"/>
+          <!-- curly side volumes -->
+          <ellipse cx="106" cy="112" rx="18" ry="32" fill="#180800"/>
+          <ellipse cx="214" cy="112" rx="18" ry="32" fill="#180800"/>
+          <!-- curly lower sides -->
+          <ellipse cx="122" cy="152" rx="15" ry="24" fill="#180800"/>
+          <ellipse cx="198" cy="152" rx="15" ry="24" fill="#180800"/>
+          <!-- curl texture bumps top -->
+          <circle cx="130" cy="78" r="10" fill="#200E00"/>
+          <circle cx="148" cy="70" r="11" fill="#200E00"/>
+          <circle cx="167" cy="68" r="10" fill="#200E00"/>
+          <circle cx="185" cy="72" r="11" fill="#200E00"/>
+          <circle cx="200" cy="82" r="9" fill="#200E00"/>
+          <circle cx="113" cy="92" r="9" fill="#200E00"/>
+          <circle cx="207" cy="92" r="9" fill="#200E00"/>
+          <!-- curl texture bumps sides -->
+          <circle cx="100" cy="108" r="8" fill="#200E00"/>
+          <circle cx="220" cy="108" r="8" fill="#200E00"/>
+          <circle cx="104" cy="128" r="7" fill="#200E00"/>
+          <circle cx="216" cy="128" r="7" fill="#200E00"/>
+          <!-- ears -->
+          <ellipse cx="118" cy="124" rx="7" ry="9" fill="#7A4428"/>
+          <ellipse cx="202" cy="124" rx="7" ry="9" fill="#7A4428"/>
+          <!-- eyes big bright -->
+          <ellipse cx="144" cy="118" rx="7" ry="6" fill="#fff"/>
+          <ellipse cx="176" cy="118" rx="7" ry="6" fill="#fff"/>
+          <ellipse cx="145" cy="119" rx="5" ry="5" fill="#180800"/>
+          <ellipse cx="177" cy="119" rx="5" ry="5" fill="#180800"/>
+          <ellipse cx="146" cy="118" rx="2" ry="2" fill="#fff"/>
+          <ellipse cx="178" cy="118" rx="2" ry="2" fill="#fff"/>
+          <!-- expressive eyebrows -->
+          <path d="M136,110 Q143,105 153,109" stroke="#180800" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <path d="M167,109 Q177,105 184,110" stroke="#180800" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <!-- nose wider -->
+          <ellipse cx="160" cy="133" rx="5.5" ry="3.5" fill="#6A3820"/>
+          <!-- big warm smile -->
+          <path d="M145,148 Q160,163 175,148" stroke="#6A3820" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+          <!-- dimples -->
+          <circle cx="142" cy="150" r="2.5" fill="rgba(100,55,25,.35)"/>
+          <circle cx="178" cy="150" r="2.5" fill="rgba(100,55,25,.35)"/>
+          <!-- hoop earrings -->
+          <circle cx="118" cy="136" r="5" stroke="#FCD34D" stroke-width="1.8" fill="none" opacity=".85"/>
+          <circle cx="202" cy="136" r="5" stroke="#FCD34D" stroke-width="1.8" fill="none" opacity=".85"/>
+        </svg>
+      </div>
+      <div class="av-body">
+        <h3 class="av-name">
+          <span class="l en">Mia</span><span class="l kr" style="display:none">미아</span>
+          <span class="av-name-sub"><span class="l en">The Peer</span><span class="l kr" style="display:none">친구형 아바타</span></span>
+        </h3>
+        <p class="av-desc"><span class="l en">Relatable, peer-like support. Shares similar experiences, encourages with genuine warmth, and bridges the gap from listening to speaking.</span><span class="l kr" style="display:none">친구처럼 공감하고 비슷한 경험을 나누며 듣기에서 말하기로의 자연스러운 다리 역할을 합니다.</span></p>
+        <div class="av-traits">
+          <span class="av-trait"><span class="l en">Peer-like</span><span class="l kr" style="display:none">동료적</span></span>
+          <span class="av-trait"><span class="l en">Encouraging</span><span class="l kr" style="display:none">격려형</span></span>
+          <span class="av-trait"><span class="l en">High warmth</span><span class="l kr" style="display:none">높은 친밀감</span></span>
+          <span class="av-trait"><span class="l en">Relatable</span><span class="l kr" style="display:none">공감적</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="sec-problem">
+  <p class="s-tag reveal"><span class="l en">The Gap in Counseling Today</span><span class="l kr" style="display:none">현재 상담의 한계</span></p>
+  <h2 class="s-h2 reveal"><span class="l en">Both therapists and clients carry enormous pressure from the moment the session begins.</span><span class="l kr" style="display:none">상담이 시작되는 순간부터 상담사와 환자 모두 큰 압박을 느낍니다.</span></h2>
+  <p class="s-p reveal"><span class="l en">Group therapy helps — but real groups can't be scheduled on demand, are hard to control, and compromise privacy. There has been no middle ground. Until now.</span><span class="l kr" style="display:none">집단상담은 도움이 되지만, 특정 환자를 위해 매번 구성하기 어렵고, 통제가 힘들며, 프라이버시 문제가 있습니다. 지금까지 중간 지점이 없었습니다.</span></p>
+  <div class="prob-grid">
+    <div class="prob-card p1 reveal">
+      <p class="prob-h"><span class="l en">One-on-One Counseling</span><span class="l kr" style="display:none">1:1 상담</span></p>
+      <p class="prob-sub"><span class="l en">High-pressure for both sides</span><span class="l kr" style="display:none">양쪽 모두 높은 부담</span></p>
+      <ul class="prob-list">
+        <li><span class="l en">Client must open up immediately with no warm-up</span><span class="l kr" style="display:none">환자는 처음부터 바로 이야기를 꺼내야 함</span></li>
+        <li><span class="l en">All conversational weight falls on the client to respond</span><span class="l kr" style="display:none">대화의 모든 무게가 환자에게 집중됨</span></li>
+        <li><span class="l en">Therapist must simultaneously listen, assess, guide, and monitor risk</span><span class="l kr" style="display:none">상담사는 동시에 듣고, 평가하고, 안내하고, 위험 신호를 감지해야 함</span></li>
+        <li><span class="l en">Silence feels like failure rather than processing</span><span class="l kr" style="display:none">침묵이 처리가 아닌 실패처럼 느껴짐</span></li>
+      </ul>
+    </div>
+    <div class="prob-card p2 reveal">
+      <p class="prob-h"><span class="l en">Group Counseling</span><span class="l kr" style="display:none">집단상담</span></p>
+      <p class="prob-sub"><span class="l en">Powerful — but not scalable on demand</span><span class="l kr" style="display:none">효과적이지만 수요 맞춤이 불가능</span></p>
+      <ul class="prob-list">
+        <li><span class="l en">Can't be assembled for every individual patient's specific needs</span><span class="l kr" style="display:none">특정 환자의 필요에 맞게 매번 구성 불가</span></li>
+        <li><span class="l en">Therapist loses direct control over pace and content</span><span class="l kr" style="display:none">상담사가 속도와 내용에 대한 직접 통제력 상실</span></li>
+        <li><span class="l en">Serious privacy concerns around real peer disclosure</span><span class="l kr" style="display:none">실제 참여자 공개로 인한 심각한 프라이버시 우려</span></li>
+        <li><span class="l en">Matching compatible peer groups is slow and expensive</span><span class="l kr" style="display:none">적합한 그룹 매칭이 느리고 비용이 많이 듦</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- MAVA -->
+<section class="sec-mava">
+  <p class="s-tag reveal"><span class="l en">The Solution</span><span class="l kr" style="display:none">해결책</span></p>
+  <h2 class="s-h2 reveal"><span class="l en">Bring the group therapy experience into every session — without the coordination overhead.</span><span class="l kr" style="display:none">집단상담의 경험을 모든 세션에서 — 조직 부담 없이 구현합니다.</span></h2>
+  <div class="mava-layout">
+    <div class="reveal">
+      <div class="mava-stage-img">
+        <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+          <rect width="480" height="360" fill="#0C1929"/>
+          <ellipse cx="240" cy="10" rx="200" ry="130" fill="rgba(24,178,148,.055)"/>
+          <ellipse cx="240" cy="330" rx="200" ry="28" fill="rgba(255,255,255,.025)"/>
+          <line x1="0" y1="288" x2="480" y2="288" stroke="rgba(255,255,255,.035)" stroke-width="1"/>
+          <!-- THERAPIST -->
+          <g transform="translate(240,72)">
+            <circle r="40" fill="rgba(24,178,148,.1)" stroke="rgba(24,178,148,.45)" stroke-width="1.5"/>
+            <circle r="27" fill="rgba(24,178,148,.16)"/>
+            <circle cx="0" cy="-8" r="9" fill="rgba(24,178,148,.92)"/>
+            <path d="M-14,18 Q-14,2 0,2 Q14,2 14,18Z" fill="rgba(24,178,148,.92)"/>
+            <text y="58" text-anchor="middle" fill="rgba(255,255,255,.55)" font-size="10" font-family="DM Sans,sans-serif" letter-spacing=".08em">THERAPIST</text>
+          </g>
+          <!-- CLIENT -->
+          <g transform="translate(370,95)">
+            <circle r="32" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/>
+            <circle r="21" fill="rgba(255,255,255,.08)"/>
+            <circle cx="0" cy="-7" r="7" fill="rgba(255,255,255,.78)"/>
+            <path d="M-10,14 Q-10,2 0,2 Q10,2 10,14Z" fill="rgba(255,255,255,.78)"/>
+            <text y="48" text-anchor="middle" fill="rgba(255,255,255,.48)" font-size="9" font-family="DM Sans,sans-serif">CLIENT</text>
+          </g>
+          <!-- AI A -->
+          <g transform="translate(98,234)">
+            <circle r="36" fill="rgba(24,178,148,.08)" stroke="rgba(24,178,148,.35)" stroke-width="1.5" stroke-dasharray="5,4"/>
+            <circle r="23" fill="rgba(24,178,148,.13)"/>
+            <circle cx="0" cy="-7" r="7.5" fill="rgba(24,178,148,.85)"/>
+            <path d="M-11,15 Q-11,2 0,2 Q11,2 11,15Z" fill="rgba(24,178,148,.85)"/>
+            <text y="52" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="DM Sans,sans-serif">Seo-yeon</text>
+            <text y="63" text-anchor="middle" fill="rgba(24,178,148,.65)" font-size="8" font-family="DM Sans,sans-serif">Listener</text>
+          </g>
+          <!-- AI B -->
+          <g transform="translate(240,258)">
+            <circle r="36" fill="rgba(96,165,250,.08)" stroke="rgba(96,165,250,.35)" stroke-width="1.5" stroke-dasharray="5,4"/>
+            <circle r="23" fill="rgba(96,165,250,.13)"/>
+            <circle cx="0" cy="-7" r="7.5" fill="rgba(96,165,250,.85)"/>
+            <path d="M-11,15 Q-11,2 0,2 Q11,2 11,15Z" fill="rgba(96,165,250,.85)"/>
+            <text y="52" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="DM Sans,sans-serif">Ji-hee</text>
+            <text y="63" text-anchor="middle" fill="rgba(96,165,250,.65)" font-size="8" font-family="DM Sans,sans-serif">Organizer</text>
+          </g>
+          <!-- AI C -->
+          <g transform="translate(382,234)">
+            <circle r="36" fill="rgba(251,191,36,.07)" stroke="rgba(251,191,36,.35)" stroke-width="1.5" stroke-dasharray="5,4"/>
+            <circle r="23" fill="rgba(251,191,36,.12)"/>
+            <circle cx="0" cy="-7" r="7.5" fill="rgba(251,191,36,.82)"/>
+            <path d="M-11,15 Q-11,2 0,2 Q11,2 11,15Z" fill="rgba(251,191,36,.82)"/>
+            <text y="52" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="DM Sans,sans-serif">Mia</text>
+            <text y="63" text-anchor="middle" fill="rgba(251,191,36,.65)" font-size="8" font-family="DM Sans,sans-serif">Peer</text>
+          </g>
+          <!-- connection lines -->
+          <line x1="226" y1="104" x2="122" y2="208" stroke="rgba(24,178,148,.22)" stroke-width="1.2" stroke-dasharray="5,4"/>
+          <line x1="240" y1="112" x2="240" y2="226" stroke="rgba(24,178,148,.22)" stroke-width="1.2" stroke-dasharray="5,4"/>
+          <line x1="254" y1="104" x2="360" y2="208" stroke="rgba(24,178,148,.22)" stroke-width="1.2" stroke-dasharray="5,4"/>
+          <!-- avatar to avatar -->
+          <line x1="134" y1="234" x2="206" y2="252" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="3,4"/>
+          <line x1="274" y1="252" x2="348" y2="234" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="3,4"/>
+          <!-- same stage label -->
+          <rect x="158" y="150" width="164" height="24" rx="12" fill="rgba(24,178,148,.1)" stroke="rgba(24,178,148,.22)" stroke-width="1"/>
+          <text x="240" y="166" text-anchor="middle" fill="rgba(24,178,148,.88)" font-size="10" font-family="DM Sans,sans-serif" letter-spacing=".1em">SAME STAGE</text>
+          <!-- pulse -->
+          <circle cx="240" cy="72" r="5" fill="#18B294" opacity=".85">
+            <animate attributeName="r" values="5;11;5" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".85;0;.85" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+    </div>
+    <div class="mava-box reveal">
+      <div class="mava-row"><span class="mava-letter">M</span><div class="mava-words"><span class="mava-word">Multi-Avatar</span><span class="mava-def"><span class="l en">Multiple AI avatars, each with distinct identity and perspective</span><span class="l kr" style="display:none">각자 고유한 정체성과 관점을 가진 복수의 AI 아바타</span></span></div></div>
+      <div class="mava-row"><span class="mava-letter">A</span><div class="mava-words"><span class="mava-word">Virtual</span><span class="mava-def"><span class="l en">Privacy-first, always available, therapist-controlled</span><span class="l kr" style="display:none">프라이버시 우선, 항시 이용 가능, 상담사 통제</span></span></div></div>
+      <div class="mava-row"><span class="mava-letter">A</span><div class="mava-words"><span class="mava-word">Agent</span><span class="mava-def"><span class="l en">Actively participating, contextually aware, responsive to each other</span><span class="l kr" style="display:none">능동적으로 참여하고, 맥락을 인식하며, 서로에게 반응</span></span></div></div>
+      <hr class="mava-div">
+      <p class="mava-desc"><span class="l en">Avatars share the same conversation context, react to each other, and the most contextually appropriate one enters the flow naturally. <strong>The client observes, relates, and joins when they feel ready.</strong></span><span class="l kr" style="display:none">아바타들은 같은 대화 맥락을 공유하고 서로에게 반응하며, 가장 적합한 아바타가 자연스럽게 참여합니다. <strong>내담자는 관찰하고, 공감하며, 준비되었을 때 대화에 합류합니다.</strong></span></p>
+      <span class="supermeta-chip"><span class="l en">Built on "Super-Metacognition" — each participant's role, goal &amp; stance, configurable by the therapist</span><span class="l kr" style="display:none">"초메타인지" 기반 — 각 참여자의 역할·목표·입장을 상담사가 직접 설정</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section class="sec-flow">
+  <p class="s-tag reveal"><span class="l en">One Counseling Intelligence Layer</span><span class="l kr" style="display:none">하나의 상담 인텔리전스 레이어</span></p>
+  <h2 class="s-h2 reveal"><span class="l en">Before, during, and after every session — connected.</span><span class="l kr" style="display:none">모든 세션의 전·중·후 — 하나로 연결됩니다.</span></h2>
+  <div class="flow-grid">
+    <div class="flow-col reveal">
+      <p class="flow-step"><span class="l en">Before Session</span><span class="l kr" style="display:none">상담 전</span></p>
+      <h3 class="flow-h"><span class="l en">Intake Intelligence</span><span class="l kr" style="display:none">인테이크 인텔리전스</span></h3>
+      <ul class="flow-pts">
+        <li><span class="l en">AI converses with the client before the session</span><span class="l kr" style="display:none">AI가 세션 전에 내담자와 대화</span></li>
+        <li><span class="l en">Generates a structured intake report for the therapist</span><span class="l kr" style="display:none">상담사를 위한 구조화된 인테이크 리포트 생성</span></li>
+        <li><span class="l en">Suggests avatar configurations matched to the client</span><span class="l kr" style="display:none">내담자 맥락에 맞는 아바타 설정 제안</span></li>
+      </ul>
+    </div>
+    <div class="flow-col center reveal">
+      <p class="flow-step"><span class="l en">During Session</span><span class="l kr" style="display:none">상담 중</span></p>
+      <h3 class="flow-h"><span class="l en">MAVA Live Stage</span><span class="l kr" style="display:none">MAVA 라이브 스테이지</span></h3>
+      <ul class="flow-pts">
+        <li><span class="l en">Therapist, client, and AI avatars on the same stage</span><span class="l kr" style="display:none">상담사, 내담자, AI 아바타가 동일 스테이지에</span></li>
+        <li><span class="l en">Client observes first — no pressure to speak immediately</span><span class="l kr" style="display:none">내담자가 먼저 관찰 — 즉시 말하기 압박 없음</span></li>
+        <li><span class="l en">Therapist controls pace and emotional intensity in real time</span><span class="l kr" style="display:none">상담사가 속도·감정 강도를 실시간 통제</span></li>
+        <li><span class="l en">Client joins naturally when ready</span><span class="l kr" style="display:none">내담자가 준비되면 자연스럽게 합류</span></li>
+      </ul>
+    </div>
+    <div class="flow-col reveal">
+      <p class="flow-step"><span class="l en">After Session</span><span class="l kr" style="display:none">상담 후</span></p>
+      <h3 class="flow-h"><span class="l en">Continuity &amp; Reports</span><span class="l kr" style="display:none">연속성 &amp; 리포트</span></h3>
+      <ul class="flow-pts">
+        <li><span class="l en">Automated therapist report with highlights and risk signals</span><span class="l kr" style="display:none">하이라이트·위험 신호를 담은 자동 리포트</span></li>
+        <li><span class="l en">Between-session care modules for the client</span><span class="l kr" style="display:none">세션 사이 내담자 케어 모듈</span></li>
+        <li><span class="l en">Progress tracking across sessions</span><span class="l kr" style="display:none">세션 간 진행 추적</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="sec-benefits">
+  <p class="s-tag reveal"><span class="l en">Why Counseling Centers Choose uniBuzzy</span><span class="l kr" style="display:none">상담센터가 uniBuzzy를 선택하는 이유</span></p>
+  <h2 class="s-h2 reveal"><span class="l en">AI-native counseling infrastructure — not an AI therapist.</span><span class="l kr" style="display:none">AI 상담사가 아닌 — AI 네이티브 상담 인프라입니다.</span></h2>
+  <div class="feat-grid">
+    <div class="feat-card reveal"><span class="feat-chip priv"><span class="l en">Privacy-First</span><span class="l kr" style="display:none">프라이버시 우선</span></span><h3 class="feat-h"><span class="l en">No real peer disclosure required</span><span class="l kr" style="display:none">실제 참여자 공개 불필요</span></h3><p class="feat-p"><span class="l en">All the empathy of group therapy without exposing real patients to each other. AI avatars model vulnerability so clients don't have to perform it first.</span><span class="l kr" style="display:none">실제 환자들을 서로에게 노출시키지 않고도 집단상담의 공감 효과를 제공합니다.</span></p></div>
+    <div class="feat-card reveal"><span class="feat-chip ctrl"><span class="l en">Therapist Control</span><span class="l kr" style="display:none">상담사 통제권</span></span><h3 class="feat-h"><span class="l en">The therapist remains fully in charge</span><span class="l kr" style="display:none">상담사가 완전한 주도권을 유지</span></h3><p class="feat-p"><span class="l en">Set each avatar's persona, emotional intensity, and direction. Intervene or redirect at any moment. uniBuzzy is a tool — you are the therapist.</span><span class="l kr" style="display:none">각 아바타의 페르소나, 감정 강도, 대화 방향을 설정하세요. uniBuzzy는 도구이고, 상담사는 여전히 상담사입니다.</span></p></div>
+    <div class="feat-card reveal"><span class="feat-chip empa"><span class="l en">Indirect Self-Awareness</span><span class="l kr" style="display:none">간접 자기인식</span></span><h3 class="feat-h"><span class="l en">People open up watching others, not being asked</span><span class="l kr" style="display:none">질문받을 때보다 남을 볼 때 더 쉽게 마음이 열립니다</span></h3><p class="feat-p"><span class="l en">Clients understand themselves more easily by watching avatars express similar experiences. Observation before participation lowers the barrier to disclosure.</span><span class="l kr" style="display:none">아바타가 비슷한 경험을 표현하는 것을 보면서 자신을 더 쉽게 이해합니다.</span></p></div>
+    <div class="feat-card reveal"><span class="feat-chip scal"><span class="l en">Operational Scale</span><span class="l kr" style="display:none">운영 효율</span></span><h3 class="feat-h"><span class="l en">More effective sessions, less overhead</span><span class="l kr" style="display:none">더 효과적인 세션, 더 적은 부담</span></h3><p class="feat-p"><span class="l en">Automated intake, live session support, and post-session reporting free therapists to focus on genuine therapeutic relationship.</span><span class="l kr" style="display:none">자동화된 인테이크, 라이브 세션 지원, 사후 리포팅으로 상담사가 진정한 치료적 관계에 집중하게 합니다.</span></p></div>
+  </div>
+</section>
+
+<!-- NOT AI -->
+<section class="sec-not">
+  <h2 class="not-h reveal">
+    <span class="l en">We are <em>not</em> building an AI therapist.<br>We are changing counseling from "speak first"<br>to "feel safe enough to speak."</span>
+    <span class="l kr" style="display:none">우리는 AI 상담사를 만드는 것이 아닙니다.<br>상담을 <em>"먼저 말해야 하는 것"</em>에서<br><em>"안전함을 느껴야 말할 수 있는 것"</em>으로 바꾸고 있습니다.</span>
+  </h2>
+  <p class="not-p reveal">
+    <span class="l en">uniBuzzy is AI-native counseling infrastructure — the layer between technology and the irreplaceable human therapist.</span>
+    <span class="l kr" style="display:none">uniBuzzy는 AI 네이티브 상담 인프라 — 기술과 대체 불가능한 인간 상담사 사이의 레이어입니다.</span>
+  </p>
+</section>
+
+<!-- VENUES -->
+<section class="sec-venues">
+  <p class="venues-label"><span class="l en">Recommended for</span><span class="l kr" style="display:none">추천 설치 공간</span></p>
+  <div class="venues-list">
+    <span class="v-pill"><span class="l en">Counseling Centers</span><span class="l kr" style="display:none">고민상담센터</span></span>
+    <span class="v-pill"><span class="l en">Youth Counseling Rooms</span><span class="l kr" style="display:none">청소년상담실</span></span>
+    <span class="v-pill"><span class="l en">Social Welfare Organizations</span><span class="l kr" style="display:none">복지관</span></span>
+    <span class="v-pill"><span class="l en">Community Centers</span><span class="l kr" style="display:none">커뮤니티센터</span></span>
+    <span class="v-pill"><span class="l en">School Counseling Offices</span><span class="l kr" style="display:none">학교 상담촌</span></span>
+    <span class="v-pill"><span class="l en">Healing &amp; Wellness Spaces</span><span class="l kr" style="display:none">힐링공간</span></span>
+    <span class="v-pill"><span class="l en">Hospital Psychiatry Departments</span><span class="l kr" style="display:none">병원 정신건강의학과</span></span>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="sec-cta" id="cta">
+  <p class="cta-tag reveal"><span class="l en">Get Early Access</span><span class="l kr" style="display:none">얼리 액세스 신청</span></p>
+  <h2 class="cta-h reveal">
+    <span class="l en">Someone's heart opens<br>before they find the words.<br><em>Let's build that space together.</em></span>
+    <span class="l kr" style="display:none">누군가의 마음은 말을 찾기 전에<br>먼저 열립니다.<br><em>그 공간을 함께 만들어 갑시다.</em></span>
+  </h2>
+  <p class="cta-p reveal"><span class="l en">We're partnering with a select group of counseling centers to pilot MAVA. Join us early and help shape the future of counseling infrastructure.</span><span class="l kr" style="display:none">선별된 상담센터들과 함께 MAVA 파일럿을 진행합니다. 얼리 파트너로 합류하여 상담 인프라의 미래를 함께 만들어 주세요.</span></p>
+  <div class="cta-actions reveal">
+    <a href="mailto:hello@unibuzzy.com" class="btn-dark"><span class="l en">Request a Demo</span><span class="l kr" style="display:none">데모 신청하기</span></a>
+    <a href="#" class="btn-out"><span class="l en">Watch the Stage →</span><span class="l kr" style="display:none">상담 스테이지 보기 →</span></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <p class="foot-logo"><em>uni</em>Buzzy</p>
+    <p class="foot-tagline"><span class="l en">AI Multi-Avatar Counseling Stage · Built at Georgia Tech CREATE-X</span><span class="l kr" style="display:none">AI 멀티 아바타 상담 스테이지 · Georgia Tech CREATE-X 지원</span></p>
+  </div>
+  <p class="foot-r">© 2025 uniBuzzy LLC · <a href="mailto:hello@unibuzzy.com">hello@unibuzzy.com</a></p>
+</footer>
+
+<script>
+function setLang(lang){
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    b.classList.toggle('active',b.textContent.trim()===(lang==='en'?'EN':'한국어'));
+  });
+  document.querySelectorAll('.l').forEach(el=>{
+    el.style.display=el.classList.contains(lang)?'':'none';
+  });
+  document.documentElement.lang=lang==='en'?'en':'ko';
+}
+setLang('en');
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});
+},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach((el,i)=>{
+  el.style.transitionDelay=(i%4)*0.08+'s';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
