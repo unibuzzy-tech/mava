@@ -16,7 +16,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--cream);color:var(--txt);line-height:1.6;overflow-x:hidden;}
+body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--cream);color:var(--txt);line-height:1.6;overflow-x:hidden;width:100%;}
 
 /* NAV */
 nav{position:fixed;top:0;width:100%;z-index:300;background:rgba(7,16,28,.88);backdrop-filter:blur(14px);padding:.85rem 3rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07);}
@@ -29,47 +29,114 @@ nav{position:fixed;top:0;width:100%;z-index:300;background:rgba(7,16,28,.88);bac
 .btn-nav{padding:.5rem 1.2rem;background:var(--teal-light);color:#fff;border:none;border-radius:8px;font-size:.88rem;font-weight:500;cursor:pointer;font-family:inherit;transition:background .2s;text-decoration:none;display:inline-block;}
 .btn-nav:hover{background:var(--teal);}
 
-/* HERO — fixed band; copy pinned on video only */
-.hero{position:relative;width:100%;height:80vh;min-height:80vh;max-height:80vh;overflow:hidden;background:var(--navy-deep);}
-.hero-video-slot{position:relative;width:100%;height:100%;overflow:hidden;}
-.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;background:var(--navy-deep);z-index:0;pointer-events:none;}
-.hero-content{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 2.5rem max(1.25rem,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:flex-start;max-height:100%;overflow:hidden;pointer-events:none;}
+/* ── HERO ──
+   Video fills 100vw × 100vh edge-to-edge.
+   object-position pushes the frame up so the bottom ~18% (SaeumSoft logo) is cropped off.
+   No overlay gradient — text contrast comes from the frosted glass boxes only.
+*/
+.hero{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  min-height:100vh;
+  overflow:hidden;
+  background:var(--navy-deep);
+  padding:0;
+  margin:0;
+}
+.hero-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:118%;          /* taller than container — bottom overflow is hidden */
+  object-fit:cover;
+  object-position:center top; /* anchor top, crop from bottom */
+  background:var(--navy-deep);
+  z-index:0;
+  pointer-events:none;
+}
+
+/*
+  hero-content spans the full hero height via inset:0.
+  flex column + space-between:
+    → hero-text-highlight floats to the TOP
+    → hero-badges-highlight is pushed to the BOTTOM
+  padding-top clears the fixed nav.
+*/
+.hero-content{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding:5.5rem 0 max(1.5rem,env(safe-area-inset-bottom,0px));
+  pointer-events:none;
+}
 .hero-content > *{pointer-events:auto;}
-.hero-text-highlight{width:fit-content;max-width:100%;padding:1rem 1.35rem;margin-bottom:.85rem;border-radius:14px;background:rgba(7,16,28,.72);border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 40px rgba(0,0,0,.22);}
-.hero-badges-highlight{display:flex;gap:1.35rem;flex-wrap:wrap;width:fit-content;max-width:100%;padding:.85rem 1.25rem 1rem;border-radius:14px;background:rgba(7,16,28,.72);border:1px solid rgba(255,255,255,.1);box-shadow:0 12px 40px rgba(0,0,0,.22);animation:fadeUp .55s .48s ease both;}
+
+/* Frosted glass text card — sits top-left */
+.hero-text-highlight{
+    width: 1000px;
+    max-width: min(90%);
+    padding: 2.1rem 8rem 2.2rem 10rem;
+    /* border-radius: 14px; */
+    background: rgba(0, 0, 0, 0.60);
+    border: 1px solid rgba(255, 255, 255, .1);
+    /* backdrop-filter: blur(10px); */
+    /* -webkit-backdrop-filter: blur(10px); */
+}
+/* Frosted glass badges strip — sits bottom-left */
+.hero-badges-highlight{
+  display:flex;
+  gap:1.35rem;
+  flex-wrap:wrap;
+  width:fit-content;
+  max-width:100%;
+  padding:.85rem 1.25rem 1rem;
+  border-radius:14px;
+  background:rgba(7,16,28,.72);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  animation:fadeUp .55s .48s ease both;
+}
+
 .hero-tag{font-size:.65rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--teal-light);margin-bottom:.55rem;animation:fadeUp .55s .05s ease both;}
-.hero-h1{font-family:'Lora',serif;font-size:clamp(1.45rem,calc(0.5rem + 2.8vw),2.35rem);font-weight:500;color:#fff;line-height:1.15;max-width:38rem;margin-bottom:.55rem;animation:fadeUp .55s .15s ease both;}
+.hero-h1{font-family:'Lora',serif;font-size:clamp(1.55rem,calc(0.5rem + 2.8vw),2.5rem);font-weight:500;color:#fff;line-height:1.15;max-width:36rem;margin-bottom:.55rem;animation:fadeUp .55s .15s ease both;}
 .hero-h1 em{color:var(--teal-light);font-style:normal;}
-.hero-p{font-size:.84rem;color:rgba(255,255,255,.88);max-width:32rem;line-height:1.55;margin-bottom:.45rem;animation:fadeUp .55s .25s ease both;}
-.hero-tagline{font-size:.78rem;color:rgba(255,255,255,.62);max-width:30rem;line-height:1.5;margin-bottom:.75rem;animation:fadeUp .55s .32s ease both;}
+.hero-p{font-size:.86rem;color:rgba(255,255,255,.88);max-width:30rem;line-height:1.55;margin-bottom:.45rem;animation:fadeUp .55s .25s ease both;}
+.hero-tagline{font-size:.8rem;color:rgba(255,255,255,.62);max-width:28rem;line-height:1.5;margin-bottom:.8rem;animation:fadeUp .55s .32s ease both;}
 .hero-tagline strong{color:rgba(255,255,255,.92);}
-.hero-actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:0;animation:fadeUp .55s .4s ease both;}
-.btn-prim{padding:.55rem 1.25rem;background:var(--teal-light);color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:background .2s,transform .15s;}
+.hero-actions{display:flex;gap:.55rem;flex-wrap:wrap;animation:fadeUp .55s .4s ease both;}
+.btn-prim{padding:.58rem 1.3rem;background:var(--teal-light);color:#fff;border:none;border-radius:8px;font-size:.84rem;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:background .2s,transform .15s;}
 .btn-prim:hover{background:var(--teal);transform:translateY(-2px);}
-.btn-sec{padding:.55rem 1.25rem;background:rgba(255,255,255,.1);color:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.28);border-radius:8px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:all .2s;}
+.btn-sec{padding:.58rem 1.3rem;background:rgba(255,255,255,.1);color:rgba(255,255,255,.88);border:1px solid rgba(255,255,255,.28);border-radius:8px;font-size:.84rem;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:all .2s;}
 .btn-sec:hover{border-color:rgba(255,255,255,.55);background:rgba(255,255,255,.18);}
+
 .hero-badge{display:flex;flex-direction:column;gap:.1rem;}
 .badge-val{font-family:'Lora',serif;font-size:1.1rem;font-weight:600;color:#fff;}
 .badge-label{font-size:.65rem;color:rgba(255,255,255,.58);}
 .badge-sub{font-size:.64rem;color:var(--teal-light);font-weight:500;}
 .badge-sep{width:1px;height:32px;background:rgba(255,255,255,.1);align-self:center;}
+
 @media (min-width:900px){
-  .hero-content{padding-left:3.5rem;padding-right:3.5rem;}
+  .hero-content{padding-right:3.5rem;}
 }
 @media (max-width:640px){
-  .hero-h1{font-size:clamp(1.35rem,5.2vw,1.75rem);}
+  .hero-h1{font-size:clamp(1.35rem,5vw,1.8rem);}
   .hero-p,.hero-tagline{font-size:.76rem;}
-  .hero-text-highlight{padding:.85rem 1rem;}
+  .hero-text-highlight{max-width:92%;padding:.85rem 1rem;}
   .hero-badges-highlight{gap:1rem;padding:.7rem 1rem .85rem;}
 }
-@media (max-height:620px){
-  .hero-h1{font-size:clamp(1.2rem,calc(0.35rem + 2.2vh),1.65rem);margin-bottom:.35rem;}
-  .hero-p,.hero-tagline{font-size:.72rem;line-height:1.45;margin-bottom:.35rem;}
-  .hero-tagline{margin-bottom:.5rem;}
-  .hero-text-highlight{padding:.65rem .9rem;margin-bottom:.55rem;}
+@media (max-height:650px){
+  .hero-content{padding-top:4.5rem;}
+  .hero-h1{font-size:clamp(1.2rem,2.5vh,1.8rem);margin-bottom:.3rem;}
+  .hero-p,.hero-tagline{font-size:.74rem;line-height:1.45;margin-bottom:.3rem;}
+  .hero-text-highlight{padding:.65rem .9rem;}
   .hero-badges-highlight{gap:.75rem;padding:.55rem .85rem .65rem;}
   .badge-val{font-size:1rem;}
-  .btn-prim,.btn-sec{padding:.45rem 1rem;font-size:.78rem;}
 }
 
 /* SECTIONS */
@@ -78,7 +145,7 @@ section{padding:6rem 4rem;}
 .s-h2{font-family:'Lora',serif;font-size:clamp(1.9rem,3.2vw,2.9rem);font-weight:500;line-height:1.2;margin-bottom:1.25rem;max-width:740px;}
 .s-p{font-size:1rem;color:var(--txt2);max-width:640px;line-height:1.78;}
 
-/* AVATARS SECTION */
+/* AVATARS */
 .sec-avatars{background:var(--navy);}
 .sec-avatars .s-tag{color:var(--teal-light);}
 .sec-avatars .s-h2{color:#fff;}
@@ -182,7 +249,7 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
 .foot-r a{color:rgba(255,255,255,.38);text-decoration:none;}
 
 /* ANIMATIONS */
-@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
 .reveal.in{opacity:1;transform:translateY(0);}
 </style>
@@ -204,36 +271,39 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
   </div>
 </nav>
 
-<!-- HERO with video background -->
+<!-- HERO: full-screen video, text top-left, badges bottom-left, no gradient -->
 <section class="hero">
-  <div class="hero-video-slot">
-    <video class="hero-video" autoplay muted loop playsinline preload="auto">
-      <source src="multi-avatar.mp4" type="video/mp4">
-    </video>
+  <video class="hero-video" autoplay muted loop playsinline preload="auto">
+    <source src="multi-avatar.mp4" type="video/mp4">
+  </video>
+
   <div class="hero-content">
+    <!-- TEXT BOX — top of the flex column → sits top-left, clears nav -->
     <div class="hero-text-highlight">
-    <p class="hero-tag">
-      <span class="l en">AI Multi-Avatar Counseling Stage · For Therapy Centers</span>
-      <span class="l kr" style="display:none">AI 멀티 아바타 상담 스테이지 · 상담센터를 위한 플랫폼</span>
-    </p>
-    <h1 class="hero-h1">
-      <span class="l en">Counseling where clients<br><em>don't have to speak first.</em></span>
-      <span class="l kr" style="display:none">환자가 먼저 말하지 않아도 되는<br><em>상담을 만듭니다.</em></span>
-    </h1>
-    <p class="hero-p">
-      <span class="l en">uniBuzzy is a next-generation counseling platform where therapists, clients, and AI patient avatars interact together on the same live stage.</span>
-      <span class="l kr" style="display:none">uniBuzzy는 상담사, 내담자, AI 환자 아바타가 함께 같은 스테이지에서 상호작용하는 차세대 상담 플랫폼입니다.</span>
-    </p>
-    <p class="hero-tagline">
-      <strong><span class="l en">Reduce the pressure of one-on-one counseling.</span><span class="l kr" style="display:none">1:1 상담의 부담은 줄이고,</span></strong><br>
-      <span class="l en">Safely scale the empathy of group therapy.</span>
-      <span class="l kr" style="display:none">집단상담의 공감 효과는 안전하게 확장합니다.</span>
-    </p>
-    <div class="hero-actions">
-      <a href="#cta" class="btn-prim"><span class="l en">Watch the Stage</span><span class="l kr" style="display:none">상담 스테이지 보기</span></a>
-      <a href="#cta" class="btn-sec"><span class="l en">Request a Demo</span><span class="l kr" style="display:none">데모 신청하기</span></a>
+      <p class="hero-tag">
+        <span class="l en">AI Multi-Avatar Counseling Stage · For Therapy Centers</span>
+        <span class="l kr" style="display:none">AI 멀티 아바타 상담 스테이지 · 상담센터를 위한 플랫폼</span>
+      </p>
+      <h1 class="hero-h1">
+        <span class="l en">Counseling where clients<br><em>don't have to speak first.</em></span>
+        <span class="l kr" style="display:none">환자가 먼저 말하지 않아도 되는<br><em>상담을 만듭니다.</em></span>
+      </h1>
+      <p class="hero-p">
+        <span class="l en">uniBuzzy is a next-generation counseling platform where therapists, clients, and AI patient avatars interact together on the same live stage.</span>
+        <span class="l kr" style="display:none">uniBuzzy는 상담사, 내담자, AI 환자 아바타가 함께 같은 스테이지에서 상호작용하는 차세대 상담 플랫폼입니다.</span>
+      </p>
+      <p class="hero-tagline">
+        <strong><span class="l en">Reduce the pressure of one-on-one counseling.</span><span class="l kr" style="display:none">1:1 상담의 부담은 줄이고,</span></strong><br>
+        <span class="l en">Safely scale the empathy of group therapy.</span>
+        <span class="l kr" style="display:none">집단상담의 공감 효과는 안전하게 확장합니다.</span>
+      </p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn-prim"><span class="l en">Watch the Stage</span><span class="l kr" style="display:none">상담 스테이지 보기</span></a>
+        <a href="#cta" class="btn-sec"><span class="l en">Request a Demo</span><span class="l kr" style="display:none">데모 신청하기</span></a>
+      </div>
     </div>
-    </div>
+
+    <!-- BADGES BOX — bottom of the flex column → pushed to bottom-left -->
     <div class="hero-badges-highlight">
       <div class="hero-badge">
         <span class="badge-val">MAVA</span>
@@ -254,7 +324,6 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
       </div>
     </div>
   </div>
-  </div>
 </section>
 
 <!-- AVATARS -->
@@ -269,60 +338,37 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
       <div class="av-portrait" style="background:#0C2820;">
         <span class="av-role-chip" style="background:rgba(24,178,148,.18);border:1px solid rgba(24,178,148,.32);color:#18B294;"><span class="l en">Type A · Listener</span><span class="l kr" style="display:none">유형 A · 경청형</span></span>
         <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
-          <defs>
-            <radialGradient id="glowA" cx="50%" cy="80%" r="50%">
-              <stop offset="0%" stop-color="#18B294" stop-opacity="0.18"/>
-              <stop offset="100%" stop-color="#18B294" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
+          <defs><radialGradient id="glowA" cx="50%" cy="80%" r="50%"><stop offset="0%" stop-color="#18B294" stop-opacity="0.18"/><stop offset="100%" stop-color="#18B294" stop-opacity="0"/></radialGradient></defs>
           <rect width="320" height="280" fill="#0C2820"/>
           <ellipse cx="160" cy="270" rx="110" ry="22" fill="url(#glowA)"/>
-          <!-- body -->
           <path d="M55,280 Q62,205 98,190 Q132,175 160,173 Q188,175 222,190 Q258,205 265,280Z" fill="#153D30"/>
-          <!-- neck -->
           <rect x="148" y="145" width="24" height="32" rx="11" fill="#C09070"/>
-          <!-- collar hint -->
           <path d="M128,192 Q160,208 192,192" stroke="rgba(24,178,148,.25)" stroke-width="1.5" fill="none"/>
-          <!-- head -->
           <ellipse cx="160" cy="122" rx="43" ry="49" fill="#C09070"/>
-          <!-- hair back -->
           <ellipse cx="160" cy="100" rx="48" ry="40" fill="#160800"/>
-          <!-- hair left flow -->
           <path d="M117,102 Q95,145 100,192 Q108,205 118,200 Q110,165 114,135Z" fill="#160800"/>
-          <!-- hair right flow -->
           <path d="M203,102 Q225,145 220,192 Q212,205 202,200 Q210,165 206,135Z" fill="#160800"/>
-          <!-- hair top -->
           <path d="M117,98 Q140,70 160,68 Q180,70 203,98 Q186,82 160,80 Q134,82 117,98Z" fill="#160800"/>
-          <!-- ears -->
           <ellipse cx="117" cy="126" rx="7" ry="9" fill="#B88060"/>
           <ellipse cx="203" cy="126" rx="7" ry="9" fill="#B88060"/>
-          <!-- eyes -->
           <ellipse cx="144" cy="120" rx="7" ry="5.5" fill="#fff"/>
           <ellipse cx="176" cy="120" rx="7" ry="5.5" fill="#fff"/>
           <ellipse cx="145" cy="121" rx="4.5" ry="4.5" fill="#1A0800"/>
           <ellipse cx="177" cy="121" rx="4.5" ry="4.5" fill="#1A0800"/>
           <ellipse cx="146" cy="120" rx="1.8" ry="1.8" fill="#fff"/>
           <ellipse cx="178" cy="120" rx="1.8" ry="1.8" fill="#fff"/>
-          <!-- eyebrows -->
           <path d="M137,112 Q144,108 152,112" stroke="#160800" stroke-width="2" fill="none" stroke-linecap="round"/>
           <path d="M168,112 Q176,108 183,112" stroke="#160800" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <!-- nose -->
           <path d="M157,129 Q156,140 160,141 Q164,140 163,129" stroke="#9A6840" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-          <!-- warm smile -->
           <path d="M148,150 Q160,160 172,150" stroke="#9A6840" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-          <!-- earrings -->
           <circle cx="117" cy="138" r="3.5" fill="#18B294" opacity=".85"/>
           <circle cx="203" cy="138" r="3.5" fill="#18B294" opacity=".85"/>
-          <!-- cheek blush -->
           <ellipse cx="140" cy="134" rx="8" ry="5" fill="rgba(255,160,120,.1)" transform="rotate(-12,140,134)"/>
           <ellipse cx="180" cy="134" rx="8" ry="5" fill="rgba(255,160,120,.1)" transform="rotate(12,180,134)"/>
         </svg>
       </div>
       <div class="av-body">
-        <h3 class="av-name">
-          <span class="l en">Seo-yeon</span><span class="l kr" style="display:none">서연</span>
-          <span class="av-name-sub"><span class="l en">The Listener</span><span class="l kr" style="display:none">경청형 아바타</span></span>
-        </h3>
+        <h3 class="av-name"><span class="l en">Seo-yeon</span><span class="l kr" style="display:none">서연</span><span class="av-name-sub"><span class="l en">The Listener</span><span class="l kr" style="display:none">경청형 아바타</span></span></h3>
         <p class="av-desc"><span class="l en">Warm and non-judgmental. Validates feelings first, opens emotional space, and creates safety before any solution is offered.</span><span class="l kr" style="display:none">따뜻하고 비판 없이 감정을 먼저 인정하며, 해결책보다 안전한 감정 공간을 엽니다.</span></p>
         <div class="av-traits">
           <span class="av-trait"><span class="l en">Mild severity</span><span class="l kr" style="display:none">경증</span></span>
@@ -338,60 +384,38 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
       <div class="av-portrait" style="background:#091830;">
         <span class="av-role-chip" style="background:rgba(59,130,246,.18);border:1px solid rgba(59,130,246,.32);color:#60A5FA;"><span class="l en">Type B · Organizer</span><span class="l kr" style="display:none">유형 B · 정리형</span></span>
         <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
-          <defs>
-            <radialGradient id="glowB" cx="50%" cy="80%" r="50%">
-              <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.16"/>
-              <stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
+          <defs><radialGradient id="glowB" cx="50%" cy="80%" r="50%"><stop offset="0%" stop-color="#3B82F6" stop-opacity="0.16"/><stop offset="100%" stop-color="#3B82F6" stop-opacity="0"/></radialGradient></defs>
           <rect width="320" height="280" fill="#091830"/>
           <ellipse cx="160" cy="270" rx="110" ry="22" fill="url(#glowB)"/>
-          <!-- blazer body -->
           <path d="M55,280 Q60,205 100,190 Q133,174 160,172 Q187,174 220,190 Q260,205 265,280Z" fill="#112240"/>
-          <!-- lapels -->
           <path d="M160,185 L144,218 L155,218 L160,204 L165,218 L176,218 Z" fill="#1A3050"/>
-          <!-- neck -->
           <rect x="148" y="143" width="24" height="33" rx="11" fill="#C8A07A"/>
-          <!-- head -->
           <ellipse cx="160" cy="120" rx="41" ry="47" fill="#C8A07A"/>
-          <!-- straight hair back -->
           <ellipse cx="160" cy="95" rx="45" ry="33" fill="#2A1508"/>
-          <!-- hair sides straight cut -->
           <rect x="115" y="95" width="13" height="68" rx="6" fill="#2A1508"/>
           <rect x="192" y="95" width="13" height="68" rx="6" fill="#2A1508"/>
-          <!-- hair top -->
           <path d="M115,93 Q138,67 160,65 Q182,67 205,93 Q187,78 160,76 Q133,78 115,93Z" fill="#2A1508"/>
-          <!-- ears -->
           <ellipse cx="118" cy="124" rx="7" ry="9" fill="#B89060"/>
           <ellipse cx="202" cy="124" rx="7" ry="9" fill="#B89060"/>
-          <!-- glasses -->
           <rect x="132" y="114" width="28" height="18" rx="5" stroke="#3A3030" stroke-width="2" fill="rgba(180,210,255,.07)"/>
           <rect x="162" y="114" width="28" height="18" rx="5" stroke="#3A3030" stroke-width="2" fill="rgba(180,210,255,.07)"/>
           <line x1="160" y1="123" x2="162" y2="123" stroke="#3A3030" stroke-width="2"/>
           <line x1="118" y1="123" x2="132" y2="123" stroke="#3A3030" stroke-width="1.5"/>
           <line x1="190" y1="123" x2="202" y2="123" stroke="#3A3030" stroke-width="1.5"/>
-          <!-- eyes -->
           <ellipse cx="146" cy="124" rx="4.5" ry="4" fill="#180C00"/>
           <ellipse cx="176" cy="124" rx="4.5" ry="4" fill="#180C00"/>
           <ellipse cx="147" cy="123" rx="1.8" ry="1.8" fill="#fff"/>
           <ellipse cx="177" cy="123" rx="1.8" ry="1.8" fill="#fff"/>
-          <!-- eyebrows straight -->
           <path d="M136,112 Q146,109 158,112" stroke="#2A1508" stroke-width="1.8" fill="none" stroke-linecap="round"/>
           <path d="M163,112 Q175,109 185,112" stroke="#2A1508" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-          <!-- nose -->
           <path d="M157,131 Q156,142 160,143 Q164,142 163,131" stroke="#A07840" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-          <!-- composed smile -->
           <path d="M149,150 Q160,156 171,150" stroke="#A07840" stroke-width="2" fill="none" stroke-linecap="round"/>
-          <!-- earrings studs -->
           <circle cx="118" cy="134" r="3" fill="#60A5FA" opacity=".9"/>
           <circle cx="202" cy="134" r="3" fill="#60A5FA" opacity=".9"/>
         </svg>
       </div>
       <div class="av-body">
-        <h3 class="av-name">
-          <span class="l en">Ji-hee</span><span class="l kr" style="display:none">지희</span>
-          <span class="av-name-sub"><span class="l en">The Organizer</span><span class="l kr" style="display:none">정리형 아바타</span></span>
-        </h3>
+        <h3 class="av-name"><span class="l en">Ji-hee</span><span class="l kr" style="display:none">지희</span><span class="av-name-sub"><span class="l en">The Organizer</span><span class="l kr" style="display:none">정리형 아바타</span></span></h3>
         <p class="av-desc"><span class="l en">Helps structure the conversation. Identifies patterns, brings calm clarity to complex emotions, and gently reframes without pushing.</span><span class="l kr" style="display:none">대화를 구조화하고, 복잡한 감정에 차분한 명확성을 가져오며, 강요 없이 부드럽게 재구성합니다.</span></p>
         <div class="av-traits">
           <span class="av-trait"><span class="l en">Moderate severity</span><span class="l kr" style="display:none">중증도</span></span>
@@ -407,29 +431,17 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
       <div class="av-portrait" style="background:#1A1000;">
         <span class="av-role-chip" style="background:rgba(217,119,6,.18);border:1px solid rgba(217,119,6,.32);color:#FCD34D;"><span class="l en">Type C · Peer</span><span class="l kr" style="display:none">유형 C · 친구형</span></span>
         <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
-          <defs>
-            <radialGradient id="glowC" cx="50%" cy="80%" r="50%">
-              <stop offset="0%" stop-color="#D97706" stop-opacity="0.2"/>
-              <stop offset="100%" stop-color="#D97706" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
+          <defs><radialGradient id="glowC" cx="50%" cy="80%" r="50%"><stop offset="0%" stop-color="#D97706" stop-opacity="0.2"/><stop offset="100%" stop-color="#D97706" stop-opacity="0"/></radialGradient></defs>
           <rect width="320" height="280" fill="#1A1000"/>
           <ellipse cx="160" cy="270" rx="110" ry="22" fill="url(#glowC)"/>
-          <!-- casual sweater body -->
           <path d="M55,280 Q60,208 100,193 Q134,177 160,175 Q186,177 220,193 Q260,208 265,280Z" fill="#2A1A05"/>
-          <!-- neck -->
           <rect x="148" y="144" width="24" height="32" rx="11" fill="#8A5030"/>
-          <!-- head -->
           <ellipse cx="160" cy="120" rx="42" ry="48" fill="#8A5030"/>
-          <!-- curly hair volume big -->
           <ellipse cx="160" cy="86" rx="56" ry="44" fill="#180800"/>
-          <!-- curly side volumes -->
           <ellipse cx="106" cy="112" rx="18" ry="32" fill="#180800"/>
           <ellipse cx="214" cy="112" rx="18" ry="32" fill="#180800"/>
-          <!-- curly lower sides -->
           <ellipse cx="122" cy="152" rx="15" ry="24" fill="#180800"/>
           <ellipse cx="198" cy="152" rx="15" ry="24" fill="#180800"/>
-          <!-- curl texture bumps top -->
           <circle cx="130" cy="78" r="10" fill="#200E00"/>
           <circle cx="148" cy="70" r="11" fill="#200E00"/>
           <circle cx="167" cy="68" r="10" fill="#200E00"/>
@@ -437,41 +449,30 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
           <circle cx="200" cy="82" r="9" fill="#200E00"/>
           <circle cx="113" cy="92" r="9" fill="#200E00"/>
           <circle cx="207" cy="92" r="9" fill="#200E00"/>
-          <!-- curl texture bumps sides -->
           <circle cx="100" cy="108" r="8" fill="#200E00"/>
           <circle cx="220" cy="108" r="8" fill="#200E00"/>
           <circle cx="104" cy="128" r="7" fill="#200E00"/>
           <circle cx="216" cy="128" r="7" fill="#200E00"/>
-          <!-- ears -->
           <ellipse cx="118" cy="124" rx="7" ry="9" fill="#7A4428"/>
           <ellipse cx="202" cy="124" rx="7" ry="9" fill="#7A4428"/>
-          <!-- eyes big bright -->
           <ellipse cx="144" cy="118" rx="7" ry="6" fill="#fff"/>
           <ellipse cx="176" cy="118" rx="7" ry="6" fill="#fff"/>
           <ellipse cx="145" cy="119" rx="5" ry="5" fill="#180800"/>
           <ellipse cx="177" cy="119" rx="5" ry="5" fill="#180800"/>
           <ellipse cx="146" cy="118" rx="2" ry="2" fill="#fff"/>
           <ellipse cx="178" cy="118" rx="2" ry="2" fill="#fff"/>
-          <!-- expressive eyebrows -->
           <path d="M136,110 Q143,105 153,109" stroke="#180800" stroke-width="2.4" fill="none" stroke-linecap="round"/>
           <path d="M167,109 Q177,105 184,110" stroke="#180800" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-          <!-- nose wider -->
           <ellipse cx="160" cy="133" rx="5.5" ry="3.5" fill="#6A3820"/>
-          <!-- big warm smile -->
           <path d="M145,148 Q160,163 175,148" stroke="#6A3820" stroke-width="2.8" fill="none" stroke-linecap="round"/>
-          <!-- dimples -->
           <circle cx="142" cy="150" r="2.5" fill="rgba(100,55,25,.35)"/>
           <circle cx="178" cy="150" r="2.5" fill="rgba(100,55,25,.35)"/>
-          <!-- hoop earrings -->
           <circle cx="118" cy="136" r="5" stroke="#FCD34D" stroke-width="1.8" fill="none" opacity=".85"/>
           <circle cx="202" cy="136" r="5" stroke="#FCD34D" stroke-width="1.8" fill="none" opacity=".85"/>
         </svg>
       </div>
       <div class="av-body">
-        <h3 class="av-name">
-          <span class="l en">Mia</span><span class="l kr" style="display:none">미아</span>
-          <span class="av-name-sub"><span class="l en">The Peer</span><span class="l kr" style="display:none">친구형 아바타</span></span>
-        </h3>
+        <h3 class="av-name"><span class="l en">Mia</span><span class="l kr" style="display:none">미아</span><span class="av-name-sub"><span class="l en">The Peer</span><span class="l kr" style="display:none">친구형 아바타</span></span></h3>
         <p class="av-desc"><span class="l en">Relatable, peer-like support. Shares similar experiences, encourages with genuine warmth, and bridges the gap from listening to speaking.</span><span class="l kr" style="display:none">친구처럼 공감하고 비슷한 경험을 나누며 듣기에서 말하기로의 자연스러운 다리 역할을 합니다.</span></p>
         <div class="av-traits">
           <span class="av-trait"><span class="l en">Peer-like</span><span class="l kr" style="display:none">동료적</span></span>
@@ -524,65 +525,19 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
           <rect width="480" height="360" fill="#0C1929"/>
           <ellipse cx="240" cy="10" rx="200" ry="130" fill="rgba(24,178,148,.055)"/>
           <ellipse cx="240" cy="330" rx="200" ry="28" fill="rgba(255,255,255,.025)"/>
-          <line x1="0" y1="288" x2="480" y2="288" stroke="rgba(255,255,255,.035)" stroke-width="1"/>
-          <!-- THERAPIST -->
-          <g transform="translate(240,72)">
-            <circle r="40" fill="rgba(24,178,148,.1)" stroke="rgba(24,178,148,.45)" stroke-width="1.5"/>
-            <circle r="27" fill="rgba(24,178,148,.16)"/>
-            <circle cx="0" cy="-8" r="9" fill="rgba(24,178,148,.92)"/>
-            <path d="M-14,18 Q-14,2 0,2 Q14,2 14,18Z" fill="rgba(24,178,148,.92)"/>
-            <text y="58" text-anchor="middle" fill="rgba(255,255,255,.55)" font-size="10" font-family="DM Sans,sans-serif" letter-spacing=".08em">THERAPIST</text>
-          </g>
-          <!-- CLIENT -->
-          <g transform="translate(370,95)">
-            <circle r="32" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/>
-            <circle r="21" fill="rgba(255,255,255,.08)"/>
-            <circle cx="0" cy="-7" r="7" fill="rgba(255,255,255,.78)"/>
-            <path d="M-10,14 Q-10,2 0,2 Q10,2 10,14Z" fill="rgba(255,255,255,.78)"/>
-            <text y="48" text-anchor="middle" fill="rgba(255,255,255,.48)" font-size="9" font-family="DM Sans,sans-serif">CLIENT</text>
-          </g>
-          <!-- AI A -->
-          <g transform="translate(98,234)">
-            <circle r="36" fill="rgba(24,178,148,.08)" stroke="rgba(24,178,148,.35)" stroke-width="1.5" stroke-dasharray="5,4"/>
-            <circle r="23" fill="rgba(24,178,148,.13)"/>
-            <circle cx="0" cy="-7" r="7.5" fill="rgba(24,178,148,.85)"/>
-            <path d="M-11,15 Q-11,2 0,2 Q11,2 11,15Z" fill="rgba(24,178,148,.85)"/>
-            <text y="52" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="DM Sans,sans-serif">Seo-yeon</text>
-            <text y="63" text-anchor="middle" fill="rgba(24,178,148,.65)" font-size="8" font-family="DM Sans,sans-serif">Listener</text>
-          </g>
-          <!-- AI B -->
-          <g transform="translate(240,258)">
-            <circle r="36" fill="rgba(96,165,250,.08)" stroke="rgba(96,165,250,.35)" stroke-width="1.5" stroke-dasharray="5,4"/>
-            <circle r="23" fill="rgba(96,165,250,.13)"/>
-            <circle cx="0" cy="-7" r="7.5" fill="rgba(96,165,250,.85)"/>
-            <path d="M-11,15 Q-11,2 0,2 Q11,2 11,15Z" fill="rgba(96,165,250,.85)"/>
-            <text y="52" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="DM Sans,sans-serif">Ji-hee</text>
-            <text y="63" text-anchor="middle" fill="rgba(96,165,250,.65)" font-size="8" font-family="DM Sans,sans-serif">Organizer</text>
-          </g>
-          <!-- AI C -->
-          <g transform="translate(382,234)">
-            <circle r="36" fill="rgba(251,191,36,.07)" stroke="rgba(251,191,36,.35)" stroke-width="1.5" stroke-dasharray="5,4"/>
-            <circle r="23" fill="rgba(251,191,36,.12)"/>
-            <circle cx="0" cy="-7" r="7.5" fill="rgba(251,191,36,.82)"/>
-            <path d="M-11,15 Q-11,2 0,2 Q11,2 11,15Z" fill="rgba(251,191,36,.82)"/>
-            <text y="52" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="DM Sans,sans-serif">Mia</text>
-            <text y="63" text-anchor="middle" fill="rgba(251,191,36,.65)" font-size="8" font-family="DM Sans,sans-serif">Peer</text>
-          </g>
-          <!-- connection lines -->
+          <g transform="translate(240,72)"><circle r="40" fill="rgba(24,178,148,.1)" stroke="rgba(24,178,148,.45)" stroke-width="1.5"/><circle r="27" fill="rgba(24,178,148,.16)"/><circle cx="0" cy="-8" r="9" fill="rgba(24,178,148,.92)"/><path d="M-14,18 Q-14,2 0,2 Q14,2 14,18Z" fill="rgba(24,178,148,.92)"/><text y="58" text-anchor="middle" fill="rgba(255,255,255,.55)" font-size="10" font-family="DM Sans,sans-serif" letter-spacing=".08em">THERAPIST</text></g>
+          <g transform="translate(370,95)"><circle r="32" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/><circle r="21" fill="rgba(255,255,255,.08)"/><circle cx="0" cy="-7" r="7" fill="rgba(255,255,255,.78)"/><path d="M-10,14 Q-10,2 0,2 Q10,2 10,14Z" fill="rgba(255,255,255,.78)"/><text y="48" text-anchor="middle" fill="rgba(255,255,255,.48)" font-size="9" font-family="DM Sans,sans-serif">CLIENT</text></g>
+          <g transform="translate(98,234)"><circle r="36" fill="rgba(24,178,148,.08)" stroke="rgba(24,178,148,.35)" stroke-width="1.5" stroke-dasharray="5,4"/><circle r="23" fill="rgba(24,178,148,.13)"/><circle cx="0" cy="-7" r="7.5" fill="rgba(24,178,148,.85)"/><path d="M-11,15 Q-11,2 0,2 Q11,2 11,15Z" fill="rgba(24,178,148,.85)"/><text y="52" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="DM Sans,sans-serif">Seo-yeon</text><text y="63" text-anchor="middle" fill="rgba(24,178,148,.65)" font-size="8" font-family="DM Sans,sans-serif">Listener</text></g>
+          <g transform="translate(240,258)"><circle r="36" fill="rgba(96,165,250,.08)" stroke="rgba(96,165,250,.35)" stroke-width="1.5" stroke-dasharray="5,4"/><circle r="23" fill="rgba(96,165,250,.13)"/><circle cx="0" cy="-7" r="7.5" fill="rgba(96,165,250,.85)"/><path d="M-11,15 Q-11,2 0,2 Q11,2 11,15Z" fill="rgba(96,165,250,.85)"/><text y="52" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="DM Sans,sans-serif">Ji-hee</text><text y="63" text-anchor="middle" fill="rgba(96,165,250,.65)" font-size="8" font-family="DM Sans,sans-serif">Organizer</text></g>
+          <g transform="translate(382,234)"><circle r="36" fill="rgba(251,191,36,.07)" stroke="rgba(251,191,36,.35)" stroke-width="1.5" stroke-dasharray="5,4"/><circle r="23" fill="rgba(251,191,36,.12)"/><circle cx="0" cy="-7" r="7.5" fill="rgba(251,191,36,.82)"/><path d="M-11,15 Q-11,2 0,2 Q11,2 11,15Z" fill="rgba(251,191,36,.82)"/><text y="52" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="9" font-family="DM Sans,sans-serif">Mia</text><text y="63" text-anchor="middle" fill="rgba(251,191,36,.65)" font-size="8" font-family="DM Sans,sans-serif">Peer</text></g>
           <line x1="226" y1="104" x2="122" y2="208" stroke="rgba(24,178,148,.22)" stroke-width="1.2" stroke-dasharray="5,4"/>
           <line x1="240" y1="112" x2="240" y2="226" stroke="rgba(24,178,148,.22)" stroke-width="1.2" stroke-dasharray="5,4"/>
           <line x1="254" y1="104" x2="360" y2="208" stroke="rgba(24,178,148,.22)" stroke-width="1.2" stroke-dasharray="5,4"/>
-          <!-- avatar to avatar -->
           <line x1="134" y1="234" x2="206" y2="252" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="3,4"/>
           <line x1="274" y1="252" x2="348" y2="234" stroke="rgba(255,255,255,.08)" stroke-width="1" stroke-dasharray="3,4"/>
-          <!-- same stage label -->
           <rect x="158" y="150" width="164" height="24" rx="12" fill="rgba(24,178,148,.1)" stroke="rgba(24,178,148,.22)" stroke-width="1"/>
           <text x="240" y="166" text-anchor="middle" fill="rgba(24,178,148,.88)" font-size="10" font-family="DM Sans,sans-serif" letter-spacing=".1em">SAME STAGE</text>
-          <!-- pulse -->
-          <circle cx="240" cy="72" r="5" fill="#18B294" opacity=".85">
-            <animate attributeName="r" values="5;11;5" dur="2.5s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values=".85;0;.85" dur="2.5s" repeatCount="indefinite"/>
-          </circle>
+          <circle cx="240" cy="72" r="5" fill="#18B294" opacity=".85"><animate attributeName="r" values="5;11;5" dur="2.5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".85;0;.85" dur="2.5s" repeatCount="indefinite"/></circle>
         </svg>
       </div>
     </div>
@@ -602,34 +557,9 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
   <p class="s-tag reveal"><span class="l en">One Counseling Intelligence Layer</span><span class="l kr" style="display:none">하나의 상담 인텔리전스 레이어</span></p>
   <h2 class="s-h2 reveal"><span class="l en">Before, during, and after every session — connected.</span><span class="l kr" style="display:none">모든 세션의 전·중·후 — 하나로 연결됩니다.</span></h2>
   <div class="flow-grid">
-    <div class="flow-col reveal">
-      <p class="flow-step"><span class="l en">Before Session</span><span class="l kr" style="display:none">상담 전</span></p>
-      <h3 class="flow-h"><span class="l en">Intake Intelligence</span><span class="l kr" style="display:none">인테이크 인텔리전스</span></h3>
-      <ul class="flow-pts">
-        <li><span class="l en">AI converses with the client before the session</span><span class="l kr" style="display:none">AI가 세션 전에 내담자와 대화</span></li>
-        <li><span class="l en">Generates a structured intake report for the therapist</span><span class="l kr" style="display:none">상담사를 위한 구조화된 인테이크 리포트 생성</span></li>
-        <li><span class="l en">Suggests avatar configurations matched to the client</span><span class="l kr" style="display:none">내담자 맥락에 맞는 아바타 설정 제안</span></li>
-      </ul>
-    </div>
-    <div class="flow-col center reveal">
-      <p class="flow-step"><span class="l en">During Session</span><span class="l kr" style="display:none">상담 중</span></p>
-      <h3 class="flow-h"><span class="l en">MAVA Live Stage</span><span class="l kr" style="display:none">MAVA 라이브 스테이지</span></h3>
-      <ul class="flow-pts">
-        <li><span class="l en">Therapist, client, and AI avatars on the same stage</span><span class="l kr" style="display:none">상담사, 내담자, AI 아바타가 동일 스테이지에</span></li>
-        <li><span class="l en">Client observes first — no pressure to speak immediately</span><span class="l kr" style="display:none">내담자가 먼저 관찰 — 즉시 말하기 압박 없음</span></li>
-        <li><span class="l en">Therapist controls pace and emotional intensity in real time</span><span class="l kr" style="display:none">상담사가 속도·감정 강도를 실시간 통제</span></li>
-        <li><span class="l en">Client joins naturally when ready</span><span class="l kr" style="display:none">내담자가 준비되면 자연스럽게 합류</span></li>
-      </ul>
-    </div>
-    <div class="flow-col reveal">
-      <p class="flow-step"><span class="l en">After Session</span><span class="l kr" style="display:none">상담 후</span></p>
-      <h3 class="flow-h"><span class="l en">Continuity &amp; Reports</span><span class="l kr" style="display:none">연속성 &amp; 리포트</span></h3>
-      <ul class="flow-pts">
-        <li><span class="l en">Automated therapist report with highlights and risk signals</span><span class="l kr" style="display:none">하이라이트·위험 신호를 담은 자동 리포트</span></li>
-        <li><span class="l en">Between-session care modules for the client</span><span class="l kr" style="display:none">세션 사이 내담자 케어 모듈</span></li>
-        <li><span class="l en">Progress tracking across sessions</span><span class="l kr" style="display:none">세션 간 진행 추적</span></li>
-      </ul>
-    </div>
+    <div class="flow-col reveal"><p class="flow-step"><span class="l en">Before Session</span><span class="l kr" style="display:none">상담 전</span></p><h3 class="flow-h"><span class="l en">Intake Intelligence</span><span class="l kr" style="display:none">인테이크 인텔리전스</span></h3><ul class="flow-pts"><li><span class="l en">AI converses with the client before the session</span><span class="l kr" style="display:none">AI가 세션 전에 내담자와 대화</span></li><li><span class="l en">Generates a structured intake report for the therapist</span><span class="l kr" style="display:none">상담사를 위한 구조화된 인테이크 리포트 생성</span></li><li><span class="l en">Suggests avatar configurations matched to the client</span><span class="l kr" style="display:none">내담자 맥락에 맞는 아바타 설정 제안</span></li></ul></div>
+    <div class="flow-col center reveal"><p class="flow-step"><span class="l en">During Session</span><span class="l kr" style="display:none">상담 중</span></p><h3 class="flow-h"><span class="l en">MAVA Live Stage</span><span class="l kr" style="display:none">MAVA 라이브 스테이지</span></h3><ul class="flow-pts"><li><span class="l en">Therapist, client, and AI avatars on the same stage</span><span class="l kr" style="display:none">상담사, 내담자, AI 아바타가 동일 스테이지에</span></li><li><span class="l en">Client observes first — no pressure to speak immediately</span><span class="l kr" style="display:none">내담자가 먼저 관찰 — 즉시 말하기 압박 없음</span></li><li><span class="l en">Therapist controls pace and emotional intensity in real time</span><span class="l kr" style="display:none">상담사가 속도·감정 강도를 실시간 통제</span></li><li><span class="l en">Client joins naturally when ready</span><span class="l kr" style="display:none">내담자가 준비되면 자연스럽게 합류</span></li></ul></div>
+    <div class="flow-col reveal"><p class="flow-step"><span class="l en">After Session</span><span class="l kr" style="display:none">상담 후</span></p><h3 class="flow-h"><span class="l en">Continuity &amp; Reports</span><span class="l kr" style="display:none">연속성 &amp; 리포트</span></h3><ul class="flow-pts"><li><span class="l en">Automated therapist report with highlights and risk signals</span><span class="l kr" style="display:none">하이라이트·위험 신호를 담은 자동 리포트</span></li><li><span class="l en">Between-session care modules for the client</span><span class="l kr" style="display:none">세션 사이 내담자 케어 모듈</span></li><li><span class="l en">Progress tracking across sessions</span><span class="l kr" style="display:none">세션 간 진행 추적</span></li></ul></div>
   </div>
 </section>
 
@@ -647,14 +577,8 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
 
 <!-- NOT AI -->
 <section class="sec-not">
-  <h2 class="not-h reveal">
-    <span class="l en">We are <em>not</em> building an AI therapist.<br>We are changing counseling from "speak first"<br>to "feel safe enough to speak."</span>
-    <span class="l kr" style="display:none">우리는 AI 상담사를 만드는 것이 아닙니다.<br>상담을 <em>"먼저 말해야 하는 것"</em>에서<br><em>"안전함을 느껴야 말할 수 있는 것"</em>으로 바꾸고 있습니다.</span>
-  </h2>
-  <p class="not-p reveal">
-    <span class="l en">uniBuzzy is AI-native counseling infrastructure — the layer between technology and the irreplaceable human therapist.</span>
-    <span class="l kr" style="display:none">uniBuzzy는 AI 네이티브 상담 인프라 — 기술과 대체 불가능한 인간 상담사 사이의 레이어입니다.</span>
-  </p>
+  <h2 class="not-h reveal"><span class="l en">We are <em>not</em> building an AI therapist.<br>We are changing counseling from "speak first"<br>to "feel safe enough to speak."</span><span class="l kr" style="display:none">우리는 AI 상담사를 만드는 것이 아닙니다.<br>상담을 <em>"먼저 말해야 하는 것"</em>에서<br><em>"안전함을 느껴야 말할 수 있는 것"</em>으로 바꾸고 있습니다.</span></h2>
+  <p class="not-p reveal"><span class="l en">uniBuzzy is AI-native counseling infrastructure — the layer between technology and the irreplaceable human therapist.</span><span class="l kr" style="display:none">uniBuzzy는 AI 네이티브 상담 인프라 — 기술과 대체 불가능한 인간 상담사 사이의 레이어입니다.</span></p>
 </section>
 
 <!-- VENUES -->
@@ -674,13 +598,10 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
 <!-- CTA -->
 <section class="sec-cta" id="cta">
   <p class="cta-tag reveal"><span class="l en">Get Early Access</span><span class="l kr" style="display:none">얼리 액세스 신청</span></p>
-  <h2 class="cta-h reveal">
-    <span class="l en">Someone's heart opens<br>before they find the words.<br><em>Let's build that space together.</em></span>
-    <span class="l kr" style="display:none">누군가의 마음은 말을 찾기 전에<br>먼저 열립니다.<br><em>그 공간을 함께 만들어 갑시다.</em></span>
-  </h2>
+  <h2 class="cta-h reveal"><span class="l en">Someone's heart opens<br>before they find the words.<br><em>Let's build that space together.</em></span><span class="l kr" style="display:none">누군가의 마음은 말을 찾기 전에<br>먼저 열립니다.<br><em>그 공간을 함께 만들어 갑시다.</em></span></h2>
   <p class="cta-p reveal"><span class="l en">We're partnering with a select group of counseling centers to pilot MAVA. Join us early and help shape the future of counseling infrastructure.</span><span class="l kr" style="display:none">선별된 상담센터들과 함께 MAVA 파일럿을 진행합니다. 얼리 파트너로 합류하여 상담 인프라의 미래를 함께 만들어 주세요.</span></p>
   <div class="cta-actions reveal">
-    <a href="mailto:hello@unibuzzy.com" class="btn-dark"><span class="l en">Request a Demo</span><span class="l kr" style="display:none">데모 신청하기</span></a>
+    <a href="mailto:unibuzzy@gmail.com" class="btn-dark"><span class="l en">Request a Demo</span><span class="l kr" style="display:none">데모 신청하기</span></a>
     <a href="#" class="btn-out"><span class="l en">Watch the Stage →</span><span class="l kr" style="display:none">상담 스테이지 보기 →</span></a>
   </div>
 </section>
@@ -691,7 +612,7 @@ footer{background:#060E1A;padding:2.5rem 4rem;display:flex;justify-content:space
     <p class="foot-logo"><em>uni</em>Buzzy</p>
     <p class="foot-tagline"><span class="l en">AI Multi-Avatar Counseling Stage · Built at Georgia Tech CREATE-X</span><span class="l kr" style="display:none">AI 멀티 아바타 상담 스테이지 · Georgia Tech CREATE-X 지원</span></p>
   </div>
-  <p class="foot-r">© 2025 uniBuzzy LLC · <a href="mailto:hello@unibuzzy.com">hello@unibuzzy.com</a></p>
+  <p class="foot-r">© 2025 uniBuzzy LLC · <a href="mailto:unibuzzy@gmail.com">unibuzzy@gmail.com</a></p>
 </footer>
 
 <script>
